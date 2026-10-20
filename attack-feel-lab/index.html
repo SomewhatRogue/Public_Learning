@@ -31,6 +31,27 @@ img{max-width:100%}
 [hidden]{display:none!important}
 .howto{display:flex;flex-wrap:wrap;gap:8px 22px;margin:10px 0 0;padding:0;list-style:none;color:var(--mute);font-size:13.5px}
 .howto li b{color:var(--brass);font-weight:600}
+
+.guide{background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:14px 16px;display:flex;flex-direction:column;gap:10px}
+.guide-head{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 14px}
+.guide-head h2{font-size:18px}
+.guide-head span{color:var(--mute);font-size:13px}
+.steps{display:flex;flex-wrap:wrap;gap:6px}
+.step{display:inline-flex;align-items:center;gap:8px;background:transparent;color:var(--ink);border:1px solid var(--line);border-radius:4px;padding:6px 12px 6px 6px;font:500 13px var(--f-body);cursor:pointer}
+.step b{display:inline-grid;place-items:center;width:22px;height:22px;border-radius:3px;background:var(--raise);color:var(--brass);font:600 12px var(--f-mono)}
+.step[aria-pressed="true"]{border-color:var(--brass);background:rgba(201,164,92,.12)}
+.step[aria-pressed="true"] b{background:var(--brass);color:var(--brass-ink)}
+.step:focus-visible{outline:2px solid var(--brass);outline-offset:2px}
+.guide-cap{margin:0;color:var(--ink);max-width:90ch;min-height:2.9em;font-size:14px}
+.guide-cap em{color:var(--brass);font-style:normal}
+.prm.pulse{animation:pulse 1.4s ease-out 2;border-radius:4px}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(201,164,92,.7)}100%{box-shadow:0 0 0 10px rgba(201,164,92,0)}}
+@media (prefers-reduced-motion: reduce){.prm.pulse{animation:none;outline:2px solid var(--brass)}}
+.aboutlab{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+@media (max-width:760px){.aboutlab{grid-template-columns:minmax(0,1fr)}}
+.aboutlab div{display:flex;flex-direction:column;gap:6px}
+.aboutlab p{margin:0;color:var(--mute)}
+.aboutlab a{color:var(--brass)}
 .credit{color:var(--mute);font-size:12.5px;display:flex;flex-wrap:wrap;gap:6px 18px;border-top:1px solid var(--line);padding-top:14px}
 .credit a{color:var(--brass)}
 body{background:var(--desk);color:var(--ink);font-family:var(--f-body);font-size:14px;line-height:1.5}
@@ -133,7 +154,7 @@ section.block{background:var(--panel);border:1px solid var(--line);border-radius
     <div>
       <h1>Attack Feel <span>Lab</span></h1>
       <p class="lede">Every attack in a game has five beats: gather, launch, travel, impact, aftermath. Speed comes from contrast between them, and impact comes from everything landing on one frame. This is the lab I built to tune the attacks in my VR god game, The Old Gods, without putting the headset on for every change. The starting values are the ones I approved.</p>
-      <ul class="howto"><li><b>1.</b> Flip Timing to Even, then back to Five beats</li><li><b>2.</b> Drag a slider and watch the beat strip</li><li><b>3.</b> Try God height to see it from above the table</li></ul>
+      
     </div>
   </header>
   <nav class="tabgroups" aria-label="Attack">
@@ -146,6 +167,19 @@ section.block{background:var(--panel);border:1px solid var(--line);border-radius
     <div class="tgroup"><span class="tglabel">Ranged</span><div class="tabs" role="tablist">
       <button class="tab" role="tab" data-tab="bow">Bow</button><button class="tab" role="tab" data-tab="crossbow">Crossbow</button><button class="tab" role="tab" data-tab="musket">Musket</button></div></div>
   </nav>
+
+  <section class="guide" aria-labelledby="guide-h">
+    <div class="guide-head"><h2 id="guide-h">Start here</h2><span>Six steps, about a minute. Each one sets the lab up for you.</span></div>
+    <div class="steps" role="group" aria-label="Guided steps">
+      <button class="step" type="button" data-step="0"><b>1</b>See the problem</button>
+      <button class="step" type="button" data-step="1"><b>2</b>See the fix</button>
+      <button class="step" type="button" data-step="2"><b>3</b>Slow it down</button>
+      <button class="step" type="button" data-step="3"><b>4</b>Change one thing</button>
+      <button class="step" type="button" data-step="4"><b>5</b>View from far away</button>
+      <button class="step" type="button" data-step="5"><b>6</b>Try another attack</button>
+    </div>
+    <p class="guide-cap" id="guide-cap" aria-live="polite">Press <em>1</em> to begin, or skip the tour and play with the sliders.</p>
+  </section>
 
   <div class="grid">
     <div class="stage">
@@ -205,6 +239,14 @@ section.block{background:var(--panel);border:1px solid var(--line);border-radius
     <p class="posenote" id="posenote" hidden></p>
   </section>
 
+  <section class="block" aria-labelledby="about-h">
+    <div class="blockhead"><h2 id="about-h">What this lab is an example of</h2></div>
+    <div class="aboutlab">
+      <div><h3>Decide before you build</h3><p>Checking combat in the real game meant putting a VR headset on and off for every change. This page moves all of that iteration onto a flat screen, where a change takes a second. The game only gets built once the numbers are agreed. The same move works for almost anything with an expensive feedback loop. <a href="../lab-first/">Read the pattern</a>.</p></div>
+      <div><h3>Coming next: lab vs game</h3><p>Once these numbers are wired into the game, this page will show each attack in the lab next to the same attack in the headset, so you can see how the five beats map onto real animation.</p></div>
+    </div>
+  </section>
+
   <section class="block" aria-labelledby="refs-h">
     <div class="blockhead">
       <h2 id="refs-h">Real things to study, beat by beat</h2>
@@ -214,7 +256,7 @@ section.block{background:var(--panel);border:1px solid var(--line);border-radius
   </section>
 
   <p class="foot">Figure proportions come from the measured Rig_Medium constants: arm reach 0.502, leg reach 0.377, shoulders at 1.107. "Even" is a stand-in for an evenly paced clip with effects on their own timers; it is not measured from the game. Camera shake is never applied to the god's view; the victim shakes instead. Real-world references open YouTube searches.</p>
-  <footer class="credit"><span>Made for <b>The Old Gods</b>, a VR god game, by <a href="https://github.com/SomewhatRogue">SomewhatRogue</a>. Built with Claude.</span><a href="../">More from Public Learning</a></footer>
+  <footer class="credit"><span>Made for <b>The Old Gods</b>, a VR god game, by <a href="https://github.com/SomewhatRogue">SomewhatRogue</a>. Built with Claude.</span><a href="../lab-first/">The pattern behind it</a><a href="../">More from Public Learning</a></footer>
 </div>
 
 <script>
@@ -1415,6 +1457,33 @@ if(!st.playing){playBtn.textContent="Play";simulateTo(S.contact+0.02);}
 drawScene();drawPoses();updatePlayhead();
 if(document.fonts&&document.fonts.ready)document.fonts.ready.then(()=>{drawScene();drawPoses();});
 requestAnimationFrame(frame);
+
+// ---------- guided tour ----------
+(function(){
+  const cap=document.getElementById("guide-cap");
+  const seg=(id,val)=>{const b=document.querySelector('#'+id+' button[data-v="'+val+'"]');if(b&&b.getAttribute("aria-pressed")!=="true")b.click();};
+  const go=t=>{if(st.tab!==t)selectTab(t);};
+  const play=()=>{if(!st.playing)playBtn.click();};
+  const restart=()=>{resetSim();st.t=0;};
+  const pulse=k=>{const el=document.getElementById("p-"+k);if(!el)return;const row=el.closest(".prm");row.classList.remove("pulse");void row.offsetWidth;row.classList.add("pulse");row.scrollIntoView({block:"nearest",behavior:reduce?"auto":"smooth"});};
+  const STEPS=[
+    {run:()=>{go("fireball");seg("seg-view","close");seg("seg-rate","1");seg("seg-mode","even");restart();play();},
+     cap:"This is <em>Even</em> timing: one steady swing, with the sound, the effects and the reaction each on their own timer. Look at the strip under the stage: the red ticks show how far each one drifts from the moment of contact. That drift is what reads as choppy."},
+    {run:()=>{seg("seg-mode","five");restart();play();},
+     cap:"Same art, <em>Five beats</em>. The wind-up is slower, the coil holds for a few frames, the throw snaps, and everything fires on one contact frame. Every tick on the strip now lines up. Speed comes from that contrast."},
+    {run:()=>{seg("seg-rate","0.25");restart();play();},
+     cap:"Quarter speed. Watch the beat name in the corner of the stage: <em>gather, launch, travel, impact, aftermath</em>. Notice the short freeze when the ball lands. That is hitstop, and it is most of what makes a hit feel like it connected."},
+    {run:()=>{seg("seg-rate","1");restart();play();pulse("hold");},
+     cap:"Now change one primitive. Drag <em>Hold at the coil</em> (highlighted on the right) to 0, then to 8. With no hold the throw feels weightless; with too much it feels slow. Every attack is the same handful of knobs set differently."},
+    {run:()=>{seg("seg-view","god");restart();play();},
+     cap:"<em>God height</em> shrinks the scene to how the player actually sees it in the game: from above the table, men 12 cm tall. Small effects vanish at this distance, but timing and silhouettes still read. Always judge from the real view."},
+    {run:()=>{seg("seg-view","close");go("musket");seg("seg-rate","1");restart();play();},
+     cap:"Every tab is the same five beats with different settings. The <em>musket</em> has a flash in the pan before the bang, the heaviest kick and smoke that hangs. Try <em>Longsword</em>, <em>Blood bolt</em> or <em>Chain lightning</em> next, and use Reset to get back to my numbers."}
+  ];
+  const btns=[...document.querySelectorAll(".step")];
+  btns.forEach(b=>b.addEventListener("click",()=>{const i=+b.dataset.step;btns.forEach(x=>x.setAttribute("aria-pressed",String(x===b)));STEPS[i].run();cap.innerHTML=STEPS[i].cap;}));
+  btns.forEach(b=>b.setAttribute("aria-pressed","false"));
+})();
 })();
 </script>
 </body>

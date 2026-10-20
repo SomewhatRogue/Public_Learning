@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Build the Lab First</title>
+<meta name="description" content="When checking your work is expensive, build a small lab that turns the core primitives into knobs, agree on them there, then build the real thing once.">
+<meta property="og:title" content="Build the Lab First">
+<meta property="og:description" content="When checking your work is expensive, build a small lab that turns the core primitives into knobs, agree on them there, then build the real thing once.">
+<meta property="og:image" content="https://somewhatrogue.github.io/Public_Learning/attack-feel-lab/preview.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* A single reading column. One drawn diagram carries the pattern; one table carries the examples. Same desk palette as the labs. */
+:root{color-scheme:dark;--desk:#111413;--panel:#181c1b;--raise:#21262a;--line:#2e3533;--ink:#e8e3d4;--mute:#9a9c92;--brass:#c9a45c;--fast:#6fa6bb;
+  --f-display:"Barlow Condensed","Arial Narrow",sans-serif;--f-body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;--f-mono:"IBM Plex Mono",ui-monospace,monospace}
+*{box-sizing:border-box}
+body{margin:0;background:var(--desk);color:var(--ink);font:16px/1.65 var(--f-body)}
+article{max-width:760px;margin:0 auto;padding-block:44px 64px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:18px}
+.crumb{font:500 13px var(--f-body);color:var(--mute)}
+.crumb a{color:var(--brass)}
+h1{font-family:var(--f-display);font-weight:700;font-size:48px;letter-spacing:.02em;text-transform:uppercase;margin:0;line-height:1;text-wrap:balance}
+h1 span{color:var(--brass)}
+h2{font-family:var(--f-display);font-weight:600;font-size:26px;letter-spacing:.04em;text-transform:uppercase;margin:22px 0 0;text-wrap:balance}
+p{margin:0;max-width:65ch}
+.lede{font-size:18px;color:var(--ink)}
+.mute{color:var(--mute)}
+a{color:var(--brass);text-underline-offset:2px}
+ol,ul{margin:0;padding-left:22px;max-width:65ch}
+li{margin:4px 0}
+li b{color:var(--ink)}
+.figure{background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:12px;overflow-x:auto;max-width:100%}
+.figure svg{display:block;width:100%;min-width:560px;height:auto}
+.figure figcaption{color:var(--mute);font-size:13.5px;margin-top:6px}
+.tablewrap{overflow-x:auto;max-width:100%;border:1px solid var(--line);border-radius:6px}
+table{width:100%;border-collapse:collapse;font-size:14.5px;min-width:560px}
+th,td{text-align:left;vertical-align:top;padding:10px 12px;border-top:1px solid var(--line)}
+th{font-family:var(--f-display);font-size:13px;letter-spacing:.1em;text-transform:uppercase;color:var(--mute);font-weight:600;border-top:0;background:var(--panel)}
+td:first-child{font-weight:600;white-space:nowrap}
+.cta{display:flex;flex-wrap:wrap;align-items:center;gap:12px 20px;background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:16px 18px;margin-top:6px}
+.cta a.btn{background:var(--brass);color:#1b1608;text-decoration:none;font-weight:600;padding:8px 14px;border-radius:4px}
+.cta p{color:var(--mute);margin:0}
+code,.prompt{font-family:var(--f-mono);font-size:13.5px}
+.prompt{display:block;background:var(--panel);border:1px solid var(--line);border-left:3px solid var(--brass);border-radius:4px;padding:12px 14px;white-space:pre-wrap;color:var(--ink);max-width:100%;overflow-x:auto}
+footer{color:var(--mute);font-size:13px;border-top:1px solid var(--line);padding-top:16px;margin-top:20px}
+</style>
+</head>
+<body>
+<article>
+  <div class="crumb"><a href="../">Public Learning</a></div>
+  <h1>Build the <span>lab</span> first</h1>
+  <p class="lede">The most useful thing I built for my VR game this month wasn't a feature. It was a small throwaway page that let me decide what a feature should feel like before anyone built it.</p>
+
+  <h2>The problem was the loop, not the work</h2>
+  <p>Combat in <em>The Old Gods</em> felt choppy. Fixing it meant changing a number, putting a VR headset on, finding a fight, watching one sword swing, taking the headset off, and describing what felt wrong. Then again. I was judging differences of tens of milliseconds through a loop that cost minutes each time.</p>
+  <p>That shape shows up everywhere. Whenever checking your work is slow, expensive or needs other people, you end up making fewer, bigger, worse decisions.</p>
+
+  <h2>The pattern</h2>
+  <figure class="figure">
+    <svg viewBox="0 0 800 270" role="img" aria-label="Research, name the primitives, then loop fast between a quick lab and a before and after comparison, then approve and build once.">
+      <defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#7d8580"/></marker>
+        <marker id="arf" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#6fa6bb"/></marker></defs>
+      <rect x="270" y="26" width="262" height="196" rx="10" fill="rgba(111,166,187,.08)" stroke="#6fa6bb" stroke-dasharray="5 5"/>
+      <text x="401" y="48" text-anchor="middle" fill="#6fa6bb" font-family="Barlow Condensed, Arial Narrow, sans-serif" font-size="17" font-weight="600" letter-spacing="1.5">FAST LOOP · SECONDS</text>
+      <rect x="560" y="26" width="228" height="196" rx="10" fill="none" stroke="#2e3533"/>
+      <text x="674" y="48" text-anchor="middle" fill="#9a9c92" font-family="Barlow Condensed, Arial Narrow, sans-serif" font-size="17" font-weight="600" letter-spacing="1.5">SLOW LOOP · ONCE</text>
+      <g font-family="IBM Plex Sans, system-ui, sans-serif" font-size="14" fill="#e8e3d4" text-anchor="middle">
+        <rect x="12" y="98" width="110" height="52" rx="8" fill="#181c1b" stroke="#7d8580"/><text x="67" y="121">1. Research</text><text x="67" y="139" fill="#9a9c92" font-size="12">how pros do it</text>
+        <rect x="142" y="98" width="110" height="52" rx="8" fill="#181c1b" stroke="#7d8580"/><text x="197" y="121">2. Name the</text><text x="197" y="139">primitives</text>
+        <rect x="288" y="70" width="104" height="52" rx="8" fill="#181c1b" stroke="#6fa6bb" stroke-width="2"/><text x="340" y="93">3. Lab:</text><text x="340" y="111" font-size="12.5">one knob each</text>
+        <rect x="410" y="70" width="108" height="52" rx="8" fill="#181c1b" stroke="#6fa6bb" stroke-width="2"/><text x="464" y="93">4. Compare</text><text x="464" y="111" font-size="12.5">before / after</text>
+        <rect x="350" y="152" width="106" height="52" rx="8" fill="#181c1b" stroke="#6fa6bb" stroke-width="2"/><text x="403" y="175">Look from the</text><text x="403" y="193">real view</text>
+        <rect x="574" y="98" width="90" height="52" rx="8" fill="rgba(201,164,92,.12)" stroke="#c9a45c" stroke-width="2"/><text x="619" y="129" font-weight="600">5. Approve</text>
+        <rect x="680" y="98" width="96" height="52" rx="8" fill="#181c1b" stroke="#7d8580"/><text x="728" y="121">6. Build it</text><text x="728" y="139">once</text>
+      </g>
+      <g fill="none" stroke="#7d8580" stroke-width="1.4">
+        <path d="M122 124H140" marker-end="url(#ar)"/><path d="M252 124H286" marker-end="url(#ar)"/>
+        <path d="M518 96H540V124H572" marker-end="url(#ar)"/><path d="M664 124H678" marker-end="url(#ar)"/>
+      </g>
+      <g fill="none" stroke="#6fa6bb" stroke-width="1.6">
+        <path d="M392 96H408" marker-end="url(#arf)"/>
+        <path d="M478 122C478 150 470 170 458 176" marker-end="url(#arf)"/>
+        <path d="M350 178C326 172 322 148 330 124" marker-end="url(#arf)"/>
+      </g>
+      <text x="401" y="246" text-anchor="middle" fill="#9a9c92" font-family="IBM Plex Sans, system-ui, sans-serif" font-size="13">Most of the deciding happens inside the dashed box, where a change costs a second.</text>
+    </svg>
+    <figcaption>The expensive check (the headset, the launch, the real customer) moves to the end and happens once.</figcaption>
+  </figure>
+  <ol>
+    <li><b>Research first.</b> Find how the best people in the field think about it. For me that was Disney's twelve principles of animation, fighting-game hitstop and Riot's effects style guide.</li>
+    <li><b>Name the primitives.</b> Boil the thing down to the few parts everything is made of. Every attack turned out to be five beats: gather, launch, travel, impact, aftermath.</li>
+    <li><b>Build a quick lab.</b> One page, one control per primitive, real constraints baked in. Mine uses the game's real character proportions.</li>
+    <li><b>Compare against today.</b> A before and after toggle on the same screen. Flipping it is what made the problem obvious in one second.</li>
+    <li><b>Approve.</b> Lock in the numbers in a form the real build reads directly, so nothing gets lost in translation.</li>
+    <li><b>Build it once.</b> The final build becomes a translation of agreed decisions, not more exploration. The expensive check happens once, at the end.</li>
+  </ol>
+
+  <h2>Why it works</h2>
+  <ul>
+    <li><b>Decisions get cheap.</b> A change in the lab costs a second. A change in the real thing costs a build and a check.</li>
+    <li><b>You argue about the parts, not the whole.</b> "It feels off" is hard to act on. "The hold is two frames too short" is easy.</li>
+    <li><b>Small sections stay editable.</b> Each primitive moves on its own, so you can fix one beat without reopening everything else.</li>
+    <li><b>The lab is a shared language.</b> Once the primitives have names and numbers, anyone can reason about them, including an AI building the final version.</li>
+    <li><b>It's disposable.</b> The lab doesn't need to be good software. It needs to make one decision easy, then it can go.</li>
+  </ul>
+  <p>For me, nine attacks went from "feels choppy" to approved in under an hour, and I never put the headset on.</p>
+
+  <h2>It isn't about games</h2>
+  <p>Any time a check is slow, a lab can come first. A few places the same move applies:</p>
+  <div class="tablewrap"><table>
+    <thead><tr><th>The work</th><th>The expensive check</th><th>The primitives</th><th>The lab</th></tr></thead>
+    <tbody>
+      <tr><td>Email nurture</td><td>Weeks of sends to see what lands</td><td>Delay between emails, send time, subject length, number of touches</td><td>A timeline with sliders and an inbox preview of what a contact sees, day by day</td></tr>
+      <tr><td>Lead scoring</td><td>A quarter of pipeline data</td><td>The weights on each signal and the threshold</td><td>Sliders over a sample of real past leads showing who would have qualified</td></tr>
+      <tr><td>Landing page</td><td>An A/B test with traffic</td><td>Hero message, proof, offer, the order of sections</td><td>Blocks you can reorder and reword, with a phone-width preview</td></tr>
+      <tr><td>Onboarding flow</td><td>Shipping and watching drop-off</td><td>Steps, what each asks for, where the first win lands</td><td>A clickable flow with timing on each step</td></tr>
+      <tr><td>A report or dashboard</td><td>Stakeholder review rounds</td><td>Which metrics, the comparison, the chart type</td><td>Sample data with toggles for each choice</td></tr>
+    </tbody>
+  </table></div>
+
+  <h2>Building a lab with Claude</h2>
+  <p>The lab doesn't need an engineer or a project. I describe the decision I'm trying to make and Claude builds the page. The ask that works for me looks roughly like this:</p>
+  <code class="prompt">Research how experts approach [the thing]. Then build me a single-page lab for it:
+- one control for each core primitive, with the expert starting values
+- a before/after toggle against how we do it today
+- a view that matches what the real user actually sees
+- real-world references for each part, so I don't have to dig
+- an approve button that saves the agreed numbers for the real build</code>
+  <p>Then I play with it, approve, and only then does the real build start. This is now the default way I work on anything where I'd otherwise be guessing.</p>
+
+  <div class="cta"><a class="btn" href="../attack-feel-lab/">Try the Attack Feel Lab</a><p>The lab from this story, with a one-minute guided tour.</p></div>
+
+  <footer>By <a href="https://github.com/SomewhatRogue">SomewhatRogue</a>, from building <em>The Old Gods</em> with Claude. <a href="../">More from Public Learning</a></footer>
+</article>
+</body>
+</html>
