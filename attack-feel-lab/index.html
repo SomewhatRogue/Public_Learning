@@ -1,0 +1,1421 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="description" content="Tune the five beats of an attack (gather, launch, travel, impact, aftermath) and see why even timing feels choppy. From The Old Gods, a VR god game.">
+<meta property="og:title" content="Attack Feel Lab">
+<meta property="og:description" content="Why combat feels choppy, and the five beats that fix it. Tune every attack on a slider.">
+<meta property="og:image" content="https://somewhatrogue.github.io/Public_Learning/attack-feel-lab/preview.png">
+<meta name="twitter:card" content="summary_large_image">
+<title>Attack Feel Lab</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* Layout: an animator's lightbox desk. Stage and exposure strip on the left, the sheet of numbers on the right, key poses and real references below.
+   One dark look on purpose: embers, frost and sparks read the way they would on a dark miniature set. */
+:root{
+  color-scheme: dark;
+  --desk:#111413; --panel:#181c1b; --raise:#21262a; --line:#2e3533; --ink:#e8e3d4; --mute:#9a9c92; --brass:#c9a45c; --brass-ink:#1b1608;
+  --b1:#d99a3a; --b2:#efdca0; --b3:#6fa6bb; --b4:#e0563f; --b5:#8a958f;
+  --f-display:"Barlow Condensed","Arial Narrow",sans-serif;
+  --f-body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,"SF Mono",Menlo,monospace;
+}
+*{box-sizing:border-box}
+html{color-scheme:dark}
+body{margin:0}
+img{max-width:100%}
+[hidden]{display:none!important}
+.howto{display:flex;flex-wrap:wrap;gap:8px 22px;margin:10px 0 0;padding:0;list-style:none;color:var(--mute);font-size:13.5px}
+.howto li b{color:var(--brass);font-weight:600}
+.credit{color:var(--mute);font-size:12.5px;display:flex;flex-wrap:wrap;gap:6px 18px;border-top:1px solid var(--line);padding-top:14px}
+.credit a{color:var(--brass)}
+body{background:var(--desk);color:var(--ink);font-family:var(--f-body);font-size:14px;line-height:1.5}
+.wrap{max-width:1320px;margin:0 auto;padding-block:28px 56px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:22px}
+header{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:12px 32px}
+h1{font-family:var(--f-display);font-weight:700;font-size:40px;letter-spacing:.02em;text-transform:uppercase;margin:0;line-height:1}
+h1 span{color:var(--brass)}
+.lede{color:var(--mute);max-width:62ch;margin:6px 0 0}
+h2{font-family:var(--f-display);font-weight:600;font-size:22px;letter-spacing:.04em;text-transform:uppercase;margin:0;text-wrap:balance}
+h3{font-family:var(--f-display);font-weight:600;font-size:15px;letter-spacing:.08em;text-transform:uppercase;margin:0;color:var(--mute)}
+.tabs{display:flex;gap:4px;flex-wrap:wrap}
+.tab{font-family:var(--f-display);font-size:18px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;background:transparent;color:var(--mute);border:1px solid var(--line);border-radius:4px;padding:6px 16px;cursor:pointer}
+.tab[aria-selected="true"]{background:var(--brass);color:var(--brass-ink);border-color:var(--brass)}
+.tab:focus-visible,.seg button:focus-visible,.btn:focus-visible,input:focus-visible{outline:2px solid var(--brass);outline-offset:2px}
+.grid{display:grid;grid-template-columns:minmax(0,1fr) 330px;gap:20px;align-items:start}
+@media (max-width:960px){.grid{grid-template-columns:minmax(0,1fr)}}
+.stage{background:var(--panel);border:1px solid var(--line);border-radius:6px;overflow:hidden;min-width:0}
+.canvasbox{position:relative;width:100%;aspect-ratio:16/8.2;max-width:100%;background:#0b0d0d}
+.canvasbox canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+.transport{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;padding:10px 12px;border-top:1px solid var(--line)}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:4px;overflow:hidden}
+.seg button{background:transparent;color:var(--mute);border:0;padding:5px 10px;font:500 12.5px var(--f-body);cursor:pointer}
+.seg button + button{border-left:1px solid var(--line)}
+.seg button[aria-pressed="true"]{background:var(--raise);color:var(--ink)}
+.seglabel{font-family:var(--f-display);font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--mute);margin-right:6px}
+.grp{display:inline-flex;align-items:center}
+.btn{background:var(--raise);color:var(--ink);border:1px solid var(--line);border-radius:4px;padding:5px 12px;font:500 12.5px var(--f-body);cursor:pointer}
+.btn.primary{background:var(--brass);border-color:var(--brass);color:var(--brass-ink);font-weight:600}
+.readout{font-family:var(--f-mono);font-size:12px;color:var(--mute);margin-left:auto;font-variant-numeric:tabular-nums;white-space:nowrap}
+.strip{display:grid;grid-template-columns:76px minmax(0,1fr);border-top:1px solid var(--line);padding:10px 12px 12px;gap:0 8px}
+.rowlabels{display:flex;flex-direction:column}
+.rowlabels div{height:20px;font-size:11.5px;color:var(--mute);display:flex;align-items:center}
+.rowlabels .big{height:28px;font-family:var(--f-display);font-size:13px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink)}
+.rowlabels .axl{height:16px}
+.tracks{position:relative;cursor:pointer;min-width:0}
+.segrow{position:relative;height:28px}
+.segb{position:absolute;top:2px;bottom:2px;border-radius:3px;font-family:var(--f-display);font-size:12.5px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:#141210;display:flex;align-items:center;padding:0 6px;overflow:hidden;white-space:nowrap}
+.segb.b1{background:var(--b1)} .segb.b2{background:var(--b2)} .segb.b3{background:var(--b3)} .segb.b4{background:var(--b4)} .segb.b5{background:var(--b5)}
+.segb.hold{background:repeating-linear-gradient(135deg,var(--b1) 0 5px,#a8742a 5px 10px)}
+.segb.idle{background:transparent;border:1px dashed var(--line);color:var(--mute)}
+.axis{position:relative;height:16px;font-family:var(--f-mono);font-size:10.5px;color:var(--mute)}
+.axis span{position:absolute;top:1px;transform:translateX(-50%)}
+.axis span::before{content:"";position:absolute;left:50%;top:-3px;height:3px;border-left:1px solid var(--line)}
+.evrow{position:relative;height:20px;border-top:1px dotted var(--line)}
+.evtick{position:absolute;top:3px;width:3px;height:14px;border-radius:2px;background:var(--ink);transform:translateX(-1px)}
+.evtick.off{background:var(--b4)}
+.playhead{position:absolute;top:0;bottom:0;width:2px;background:var(--brass);box-shadow:0 0 0 1px rgba(0,0,0,.4);pointer-events:none}
+.contactline{position:absolute;top:28px;bottom:0;border-left:1px dashed rgba(224,86,63,.6);pointer-events:none}
+.stripnote{grid-column:1 / -1;font-size:12px;color:var(--mute);margin-top:6px}
+aside.sheet{background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:14px 14px 16px;display:flex;flex-direction:column;gap:14px}
+.sheethead{display:flex;flex-direction:column;gap:4px}
+.sheethead p{margin:0;color:var(--mute);font-size:12.5px}
+.pgroup{display:flex;flex-direction:column;gap:10px;padding-top:10px;border-top:1px solid var(--line)}
+.pgroup h3{display:flex;align-items:center;gap:8px}
+.dot{width:10px;height:10px;border-radius:2px;display:inline-block}
+.prm{display:flex;flex-direction:column;gap:3px}
+.prm label{display:flex;justify-content:space-between;gap:8px;font-size:13px}
+.prm output{font-family:var(--f-mono);font-size:12px;color:var(--brass);font-variant-numeric:tabular-nums;white-space:nowrap}
+.prm small{color:var(--mute);font-size:11.5px;line-height:1.35}
+input[type=range]{width:100%;accent-color:var(--brass);margin:2px 0}
+.actions{display:flex;flex-wrap:wrap;gap:8px;padding-top:12px;border-top:1px solid var(--line)}
+.status{font-size:12px;color:var(--mute);min-height:1.4em;margin:0}
+.status b{color:var(--ink);font-weight:500}
+textarea.json{width:100%;height:160px;background:#0c0e0e;color:var(--ink);border:1px solid var(--line);border-radius:4px;font:12px var(--f-mono);padding:8px}
+section.block{background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:16px;display:flex;flex-direction:column;gap:14px}
+.blockhead{display:flex;flex-direction:column;gap:4px}
+.blockhead p{margin:0;color:var(--mute);max-width:75ch}
+.poses{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+@media (max-width:640px){.poses{grid-template-columns:minmax(0,1fr)}}
+.pose{border:1px solid var(--line);border-radius:5px;overflow:hidden;background:#0b0d0d;display:flex;flex-direction:column}
+.pose .pc{position:relative;aspect-ratio:1/1;max-width:100%}
+.pose canvas{position:absolute;inset:0;width:100%;height:100%}
+.pose .cap{padding:8px 10px;background:var(--panel);display:flex;flex-direction:column;gap:2px;border-top:1px solid var(--line)}
+.pose .cap strong{font-family:var(--f-display);font-size:16px;letter-spacing:.06em;text-transform:uppercase}
+.pose .cap span{font-size:12.5px;color:var(--mute)}
+.refs{width:100%;border-collapse:collapse;font-size:13.5px}
+.refs th,.refs td{text-align:left;vertical-align:top;padding:9px 10px;border-top:1px solid var(--line)}
+.refs th{font-family:var(--f-display);font-size:12.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--mute);font-weight:600;border-top:0}
+.refs td:first-child{white-space:nowrap}
+.refs a{color:var(--brass);text-underline-offset:2px}
+.tablewrap{overflow-x:auto;max-width:100%}
+.beatchip{display:inline-flex;align-items:center;gap:6px;font-family:var(--f-display);font-weight:600;letter-spacing:.06em;text-transform:uppercase}
+.foot{color:var(--mute);font-size:12px;max-width:80ch}
+@media (prefers-reduced-motion: reduce){*{scroll-behavior:auto}}
+
+.tabgroups{display:flex;flex-wrap:wrap;gap:10px 22px;align-items:center}
+.tgroup{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.tglabel{font-family:var(--f-display);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--mute)}
+.tab.done::after{content:"";display:inline-block;width:6px;height:6px;border-radius:50%;background:currentColor;margin-left:7px;vertical-align:middle;opacity:.75}
+.seg.choice{flex-wrap:wrap}
+.seg.choice button{padding:6px 10px}
+.pose{margin:0}
+.posenote{margin:0;color:var(--mute);max-width:80ch;font-size:13.5px;border-left:2px solid var(--brass);padding-left:12px}
+.evnone{position:absolute;left:4px;top:2px;font-size:11px;color:var(--mute)}
+.evoff{position:absolute;top:2px;font:11px var(--f-mono);color:var(--b4);white-space:nowrap}
+</style>
+
+<div class="wrap">
+  <header>
+    <div>
+      <h1>Attack Feel <span>Lab</span></h1>
+      <p class="lede">Every attack in a game has five beats: gather, launch, travel, impact, aftermath. Speed comes from contrast between them, and impact comes from everything landing on one frame. This is the lab I built to tune the attacks in my VR god game, The Old Gods, without putting the headset on for every change. The starting values are the ones I approved.</p>
+      <ul class="howto"><li><b>1.</b> Flip Timing to Even, then back to Five beats</li><li><b>2.</b> Drag a slider and watch the beat strip</li><li><b>3.</b> Try God height to see it from above the table</li></ul>
+    </div>
+  </header>
+  <nav class="tabgroups" aria-label="Attack">
+    <div class="tgroup"><span class="tglabel">Living casters</span><div class="tabs" role="tablist">
+      <button class="tab" role="tab" data-tab="fireball">Fireball</button><button class="tab" role="tab" data-tab="ice">Ice line</button><button class="tab" role="tab" data-tab="arcane">Arcane missile</button><button class="tab" role="tab" data-tab="chain">Chain lightning</button><button class="tab" role="tab" data-tab="smite">Smite</button></div></div>
+    <div class="tgroup"><span class="tglabel">Dead casters</span><div class="tabs" role="tablist">
+      <button class="tab" role="tab" data-tab="blood">Blood bolt</button><button class="tab" role="tab" data-tab="plague">Rot bolt</button><button class="tab" role="tab" data-tab="bone">Bone shards</button><button class="tab" role="tab" data-tab="frost">Frost bolt</button></div></div>
+    <div class="tgroup"><span class="tglabel">Melee</span><div class="tabs" role="tablist">
+      <button class="tab" role="tab" data-tab="sword">Sword</button><button class="tab" role="tab" data-tab="greatsword">Longsword</button><button class="tab" role="tab" data-tab="spear">Spear</button><button class="tab" role="tab" data-tab="shield">Shield</button></div></div>
+    <div class="tgroup"><span class="tglabel">Ranged</span><div class="tabs" role="tablist">
+      <button class="tab" role="tab" data-tab="bow">Bow</button><button class="tab" role="tab" data-tab="crossbow">Crossbow</button><button class="tab" role="tab" data-tab="musket">Musket</button></div></div>
+  </nav>
+
+  <div class="grid">
+    <div class="stage">
+      <div class="canvasbox" id="stagebox"><canvas id="stage" aria-label="Animated block-in of the attack"></canvas></div>
+      <div class="transport">
+        <button class="btn" id="play" type="button">Pause</button>
+        <button class="btn" id="stepb" type="button" title="Step one frame (1/30 s)">Step frame</button>
+        <span class="grp"><span class="seglabel">Speed</span><span class="seg" id="seg-rate"><button type="button" data-v="1" aria-pressed="true">1×</button><button type="button" data-v="0.25" aria-pressed="false">¼×</button></span></span>
+        <span class="grp"><span class="seglabel">Timing</span><span class="seg" id="seg-mode"><button type="button" data-v="five" aria-pressed="true">Five beats</button><button type="button" data-v="even" aria-pressed="false">Even</button></span></span>
+        <span class="grp"><span class="seglabel">View</span><span class="seg" id="seg-view"><button type="button" data-v="close" aria-pressed="true">Close</button><button type="button" data-v="god" aria-pressed="false">God height</button></span></span>
+        <span class="grp"><span class="seg" id="seg-onion"><button type="button" data-v="1" aria-pressed="false">Onion skin</button></span></span>
+        <span class="grp"><span class="seg" id="seg-sound"><button type="button" data-v="1" aria-pressed="false">Sound</button></span></span>
+        <span class="readout" id="readout">0.000 s · f 0</span>
+      </div>
+      <div class="strip">
+        <div class="rowlabels">
+          <div class="big">Beats</div>
+          <div class="axl"></div>
+          <div>Damage</div><div>Sound</div><div>Effects</div><div>Reaction</div><div>Recoil</div>
+        </div>
+        <div class="tracks" id="tracks" title="Click to scrub">
+          <div class="segrow" id="segrow"></div>
+          <div class="axis" id="axis"></div>
+          <div class="evrow" data-ev="damage"></div><div class="evrow" data-ev="sound"></div><div class="evrow" data-ev="effects"></div><div class="evrow" data-ev="reaction"></div><div class="evrow" data-ev="recoil"></div>
+          <div class="contactline" id="contactline"></div>
+          <div class="playhead" id="playhead"></div>
+        </div>
+        <p class="stripnote" id="stripnote"></p>
+      </div>
+    </div>
+
+    <aside class="sheet" aria-label="Timing numbers">
+      <div class="sheethead">
+        <h2 id="sheettitle">Fireball</h2>
+        <p id="sheetnote">Every number here becomes a field on the attack's feel data.</p>
+      </div>
+      <div id="params"></div>
+      <div class="actions">
+                <button class="btn" id="copy" type="button">Copy as JSON</button>
+        <button class="btn" id="reset" type="button">Reset</button>
+      </div>
+      <p class="status" id="status"></p>
+      <textarea class="json" id="jsonbox" hidden readonly aria-label="Numbers as JSON"></textarea>
+    </aside>
+  </div>
+
+  <section class="block" aria-labelledby="poses-h">
+    <div class="blockhead">
+      <h2 id="poses-h">Key poses to approve</h2>
+      <p id="poses-p">These three poses are the targets a Blender animation would hit. Judge them as silhouettes; the faint figure behind is the idle pose.</p>
+    </div>
+    <div class="poses">
+      <figure class="pose"><div class="pc"><canvas id="pose0"></canvas></div><figcaption class="cap"><strong id="cap0t">Coil</strong><span id="cap0"></span></figcaption></figure>
+      <figure class="pose"><div class="pc"><canvas id="pose1"></canvas></div><figcaption class="cap"><strong id="cap1t">Release</strong><span id="cap1"></span></figcaption></figure>
+      <figure class="pose"><div class="pc"><canvas id="pose2"></canvas></div><figcaption class="cap"><strong id="cap2t">Recoil</strong><span id="cap2"></span></figcaption></figure>
+    </div>
+    <p class="posenote" id="posenote" hidden></p>
+  </section>
+
+  <section class="block" aria-labelledby="refs-h">
+    <div class="blockhead">
+      <h2 id="refs-h">Real things to study, beat by beat</h2>
+      <p>Practical-effects and real-weapon references: the real motion each beat should borrow from. Each link opens a search for footage.</p>
+    </div>
+    <div class="tablewrap"><table class="refs"><thead><tr><th>Beat</th><th>Look for</th><th>Watch</th></tr></thead><tbody id="refbody"></tbody></table></div>
+  </section>
+
+  <p class="foot">Figure proportions come from the measured Rig_Medium constants: arm reach 0.502, leg reach 0.377, shoulders at 1.107. "Even" is a stand-in for an evenly paced clip with effects on their own timers; it is not measured from the game. Camera shake is never applied to the god's view; the victim shakes instead. Real-world references open YouTube searches.</p>
+  <footer class="credit"><span>Made for <b>The Old Gods</b>, a VR god game, by <a href="https://github.com/SomewhatRogue">SomewhatRogue</a>. Built with Claude.</span><a href="../">More from Public Learning</a></footer>
+</div>
+
+<script>
+(() => {
+"use strict";
+const D2R=Math.PI/180;
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+const lerp=(a,b,u)=>a+(b-a)*u;
+const eIO=u=>u<.5?4*u*u*u:1-Math.pow(-2*u+2,3)/2;
+const eOut=u=>1-Math.pow(1-u,3);
+const eOutQ=u=>1-(1-u)*(1-u);
+const eIn=u=>u*u;
+const eBack=(u,c=1.5)=>{const c3=c+1;return 1+c3*Math.pow(u-1,3)+c*Math.pow(u-1,2);};
+const v=(x,y)=>({x,y}); const add=(a,b)=>v(a.x+b.x,a.y+b.y); const mul=(a,s)=>v(a.x*s,a.y*s); const sub=(a,b)=>v(a.x-b.x,a.y-b.y);
+const lerpV=(a,b,u)=>v(lerp(a.x,b.x,u),lerp(a.y,b.y,u));
+const len=a=>Math.hypot(a.x,a.y); const norm=a=>{const l=len(a)||1;return v(a.x/l,a.y/l);};
+function mulberry(s){return function(){s|=0;s=s+0x6D2B79F5|0;let t=Math.imul(s^s>>>15,1|s);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;}}
+
+// ---------- rig (Rig_Medium proportions, rig units) ----------
+const HIP=0.40, SPINE=0.69, NECK=0.75, UA=0.25, FA=0.25, UL=0.20, LL=0.20, ANK=0.05, FOOT=0.13;
+const CASTER_X=1.35;
+const POSE_KEYS=["lean","hx","hy","head","sR","eR","sL","eL","sw"];
+function ik2(a,b,l1,l2,preferLow){const d0=sub(b,a);let d=len(d0);d=Math.min(Math.max(d,1e-4),l1+l2-1e-4);
+  const base=Math.atan2(d0.y,d0.x);const A=Math.acos(clamp((l1*l1+d*d-l2*l2)/(2*l1*d),-1,1));
+  const k1=add(a,v(Math.cos(base+A)*l1,Math.sin(base+A)*l1)),k2=add(a,v(Math.cos(base-A)*l1,Math.sin(base-A)*l1));
+  return preferLow?(k1.y<k2.y?k1:k2):(k1.x>k2.x?k1:k2);}
+function rig(p,baseX,f,wp){
+  const a=p.lean*D2R;
+  const up=v(-Math.sin(a),Math.cos(a)),fw=v(Math.cos(a),Math.sin(a)),dn=mul(up,-1);
+  const hip=v(p.hx,HIP-p.hy);
+  const sh=add(hip,mul(up,SPINE)),neck=add(hip,mul(up,NECK));
+  const ha=a+(p.head||0)*D2R,hup=v(-Math.sin(ha),Math.cos(ha)),hfw=v(Math.cos(ha),Math.sin(ha));
+  const head=add(neck,mul(hup,0.33));
+  const dir=t=>add(mul(dn,Math.cos(t*D2R)),mul(fw,Math.sin(t*D2R)));
+  const elR=add(sh,mul(dir(p.sR),UA)),hR=add(elR,mul(dir(p.sR+p.eR),FA));
+  let elL=add(sh,mul(dir(p.sL),UA)),hL=add(elL,mul(dir(p.sL+p.eL),FA));
+  let wd=null;if(p.sw!=null)wd=dir(p.sw);
+  if(wp&&wp.lhand!=null&&wd){const tgt=add(hR,mul(wd,wp.lhand));elL=ik2(sh,tgt,UA,FA,true);hL=tgt;}
+  const leg=(ax)=>{const an=v(ax,ANK);const knee=ik2(hip,an,UL,LL,false);return {knee,ank:an,toe:v(ax+0.09,0.02),heel:v(ax-0.05,0.02)};};
+  const lf=leg(FOOT),lb=leg(-FOOT);
+  const M=q=>q?v(baseX+f*q.x,q.y):null,Mv=q=>q?v(f*q.x,q.y):null;
+  return {hip:M(hip),sh:M(sh),neck:M(neck),head:M(head),hup:Mv(hup),hfw:Mv(hfw),up:Mv(up),fw:Mv(fw),
+    elR:M(elR),hR:M(hR),elL:M(elL),hL:M(hL),wd:Mv(wd),
+    kF:M(lf.knee),aF:M(lf.ank),tF:M(lf.toe),eF:M(lf.heel),kB:M(lb.knee),aB:M(lb.ank),tB:M(lb.toe),eB:M(lb.heel),f};
+}
+function lerpPose(a,b,u){const o={};for(const k of POSE_KEYS){const x=a[k],y=b[k];o[k]=(x==null||y==null)?(x??y):lerp(x,y,u);}return o;}
+function exag(p,idle,e){const o={};for(const k of POSE_KEYS){if(p[k]==null){o[k]=p[k];continue;}o[k]=idle[k]+(p[k]-idle[k])*e;}return o;}
+function weaponPts(J,wp){
+  if(!wp||!J.wd)return null;const d=J.wd,h=J.hR;
+  if(wp.type==="sword")return {a:add(h,mul(d,-(wp.pommel||0.05))),b:add(h,mul(d,wp.len)),guard:add(h,mul(d,0.06)),tip:add(h,mul(d,wp.len))};
+  if(wp.type==="spear")return {a:add(h,mul(d,-wp.back)),b:add(h,mul(d,wp.fwd)),tip:add(h,mul(d,wp.fwd))};
+  if(wp.type==="crossbow")return {a:add(h,mul(d,-0.40)),b:add(h,mul(d,0.30)),tip:add(h,mul(d,0.30))};
+  if(wp.type==="musket")return {a:add(h,mul(d,-0.32)),b:add(h,mul(d,0.82)),tip:add(h,mul(d,0.82)),lock:add(h,mul(d,0.04))};
+  return null;
+}
+
+// ---------- attack definitions ----------
+const BEATS=[["Overall","var(--mute)"],["1 · Gather","var(--b1)"],["2 · Launch","var(--b2)"],["3 · Travel","var(--b3)"],["4 · Impact","var(--b4)"],["5 · Aftermath","var(--b5)"]];
+const ICE_N=7;
+const yt=q=>"https://www.youtube.com/results?search_query="+encodeURIComponent(q);
+const P_EXAG={k:"exag",label:"Pose exaggeration",unit:"×",min:.5,max:1.5,step:.05,def:1,beat:0,help:"Scales every pose away from idle. Far cameras want more."};
+const ATK={
+  fireball:{name:"Fireball",kind:"ranged",style:"robe",proj:{type:"ball",arc:0.12},fx:"fire",react:{amp:16,push:0.14},
+    cards:["Coil","Release","Recoil"],
+    poses:()=>({idle:{lean:0,hx:0,hy:0,head:0,sR:18,eR:35,sL:-8,eL:25},
+      coil:{lean:15,hx:-0.07,hy:0.05,head:-7,sR:-150,eR:55,sL:58,eL:12},
+      release:{lean:-14,hx:0.08,hy:0.03,head:7,sR:92,eR:2,sL:-38,eL:22}}),
+    recoil:p=>({lean:2+p.recoil*1.9,hx:-p.recoil*0.02,hy:0.02,head:-p.recoil*1.6,sR:62,eR:22,sL:-18,eL:25}),
+    params:[
+      {k:"windup",label:"Gather",unit:"s",min:.15,max:1.2,step:.01,def:.5,beat:1,help:"Embers spiral into the hand, the ball grows, the caster leans back."},
+      {k:"hold",label:"Hold at the coil",unit:"frames",min:0,max:8,step:1,def:3,beat:1,help:"The held pose the eye reads the attack from."},
+      {k:"strike",label:"Throw",unit:"frames",min:1,max:8,step:1,def:2,beat:2,help:"2 to 3 frames reads as a snap."},
+      {k:"recoil",label:"Caster recoil",unit:"% height",min:0,max:10,step:.5,def:5,beat:2,help:"The caster is pushed back by his own throw."},
+      {k:"speed",label:"Ball speed",unit:"bodies/s",min:3,max:20,step:.5,def:8,beat:3,help:"Constant speed. A ball that slows near the target reads wrong."},
+      {k:"stretch",label:"Stretch at speed",unit:"",min:0,max:1,step:.05,def:.45,beat:3,help:"Longer and thinner the faster it goes, volume kept."},
+      {k:"hitstop",label:"Hitstop on victim",unit:"ms",min:0,max:200,step:5,def:80,beat:4,help:"Victim freezes and shakes, then is shoved away."},
+      {k:"flinch",label:"Victim reaction",unit:"×",min:0,max:2,step:.05,def:1,beat:4,help:"Lean and shove away from the blast."},
+      {k:"aftermath",label:"Smoke and small fires",unit:"s",min:.5,max:4,step:.1,def:2.2,beat:5,help:"Embers drift, smoke rises, flames gutter out."},
+      {k:"recover",label:"Caster recovery",unit:"s",min:.15,max:1.2,step:.01,def:.45,beat:5,help:"Settles back with a small overshoot."},P_EXAG],
+    refs:[[1,"Embers pulled off a forge or bellows-fed coals: how sparks spiral and brighten as they are drawn in",yt("forge bellows embers slow motion")],
+      [2,"Flintlock pan flash and the smoke ring left hanging where the shot left",yt("flintlock pan flash slow motion")],
+      [3,"A thrown torch or burning ball in flight: the flame streams back and sheds embers",yt("thrown torch slow motion")],
+      [4,"Fire hitting a surface: the one squashed frame, the flash, flame spreading out sideways",yt("fireball impact practical effect slow motion")],
+      [5,"Embers settling and small flames guttering out on dirt; smoke rising slower than the burst",yt("campfire embers dying close up")]]},
+  ice:{name:"Ice line",kind:"ground",style:"robe",fx:"ice",react:{amp:5,push:0},
+    cards:["Arms up","Slam","Bounce"],
+    poses:()=>({idle:{lean:0,hx:0,hy:0,head:0,sR:18,eR:35,sL:-8,eL:25},
+      coil:{lean:9,hx:-0.04,hy:-0.03,head:-9,sR:165,eR:20,sL:150,eL:28},
+      release:{lean:-36,hx:0.10,hy:0.16,head:12,sR:75,eR:0,sL:62,eL:10}}),
+    recoil:p=>({lean:-22+p.recoil*1.4,hx:0.06,hy:0.09+p.recoil*0.004,head:6,sR:55,eR:12,sL:40,eL:15}),
+    params:[
+      {k:"windup",label:"Gather",unit:"s",min:.15,max:1.2,step:.01,def:.5,beat:1,help:"Frost creeps on the palms, a rime ring spreads, the caster rises."},
+      {k:"hold",label:"Hold at the top",unit:"frames",min:0,max:8,step:1,def:2,beat:1,help:"Arms up, the beat before the slam."},
+      {k:"strike",label:"Slam",unit:"frames",min:1,max:8,step:1,def:2,beat:2,help:"Palm down to the ground."},
+      {k:"recoil",label:"Caster bounce",unit:"% height",min:0,max:10,step:.5,def:3,beat:2,help:"His own small squat and bounce off the slam."},
+      {k:"interval",label:"Crystal spacing",unit:"ms",min:15,max:90,step:1,def:40,beat:3,help:"Time between crystals erupting along the crack."},
+      {k:"grow",label:"Crystal growth",unit:"frames",min:2,max:10,step:1,def:5,beat:3,help:"Each crystal pops up over this many frames."},
+      {k:"overshoot",label:"Growth overshoot",unit:"%",min:0,max:40,step:1,def:15,beat:3,help:"Grows past full size, then settles."},
+      {k:"hitstop",label:"Hitstop on victim",unit:"ms",min:0,max:200,step:5,def:100,beat:4,help:"The big cluster bursts up around him."},
+      {k:"shatterHold",label:"Frozen hold, then shatter",unit:"s",min:.1,max:1.2,step:.05,def:.45,beat:4,help:"How long he stays encased before it shatters."},
+      {k:"aftermath",label:"Mist and melt",unit:"s",min:.5,max:4,step:.1,def:1.8,beat:5,help:"Shards fall, mist drifts, puddles fade."},
+      {k:"recover",label:"Caster recovery",unit:"s",min:.15,max:1.2,step:.01,def:.55,beat:5,help:"Rises back to idle."},P_EXAG],
+    refs:[[1,"Hoarfrost forming on glass or leaves: frost creeps outward in feathery fronts",yt("hoarfrost forming timelapse")],
+      [2,"Lake ice cracking: the instant crack that runs away from the contact",yt("lake ice crack spreading slow motion")],
+      [3,"Ice crystals and needle ice growing: sharp facets, light faces and dark faces",yt("ice crystal growth timelapse")],
+      [4,"Icicles and ice shattering in slow motion: big shards, glitter, a cold puff",yt("icicle shatter slow motion")],
+      [5,"Ice melting on stone: wet dark patches spreading, then drying out",yt("ice melting timelapse puddle")]]},
+  sword:{name:"Sword",kind:"melee",style:"footman",vx:2.62,weapon:{type:"sword",len:0.66},fx:"sparks",react:{amp:13,push:0.06},
+    cards:["Coil","Contact","Recoil"],
+    poses:()=>({idle:{lean:0,hx:0,hy:0,head:0,sR:25,eR:50,sL:-5,eL:30,sw:160},
+      coil:{lean:12,hx:-0.06,hy:0.04,head:-7,sR:175,eR:60,sL:40,eL:30,sw:300},
+      release:{lean:-17,hx:0.09,hy:0.07,head:8,sR:95,eR:0,sL:-30,eL:25,sw:72}}),
+    recoil:p=>({lean:-6+p.recoil*1.5,hx:0.05-p.recoil*0.01,hy:0.04,head:2,sR:68,eR:22,sL:-15,eL:28,sw:62}),
+    params:[
+      {k:"windup",label:"Wind-up",unit:"s",min:.15,max:1.2,step:.01,def:.4,beat:1,help:"Sword raised overhead, weight on the back foot."},
+      {k:"hold",label:"Hold at the top",unit:"frames",min:0,max:8,step:1,def:3,beat:1,help:"The coil. This is where the god reads the attack."},
+      {k:"strike",label:"Strike",unit:"frames",min:1,max:8,step:1,def:3,beat:2,help:"From the top to contact."},
+      {k:"trail",label:"Weapon trail",unit:"frames",min:0,max:12,step:1,def:6,beat:2,help:"Our 3D smear. Only on during the strike."},
+      {k:"hitstop",label:"Hitstop, both units",unit:"ms",min:0,max:200,step:5,def:70,beat:4,help:"Blade stopped in the body. Attacker and victim both freeze."},
+      {k:"flinch",label:"Victim reaction",unit:"×",min:0,max:2,step:.05,def:1,beat:4,help:"Tier 1 flinch: lean away, spring back."},
+      {k:"recoil",label:"Bounce off the hit",unit:"% height",min:0,max:10,step:.5,def:2,beat:5,help:"The attacker rebounds a little after the freeze."},
+      {k:"recover",label:"Recovery",unit:"s",min:.15,max:1.2,step:.01,def:.45,beat:5,help:"Fast in, slow out: the weight goes here."},P_EXAG],
+    refs:[[1,"HEMA overhead cuts: the raised guard and the weight shift onto the back foot",yt("HEMA overhead cut slow motion")],
+      [2,"Tameshigiri test cuts: how fast the blade travels compared with the wind-up",yt("tameshigiri slow motion")],
+      [4,"Steel striking armour: the spark spray, the stopped blade, the jolt up the arm",yt("sword hitting armor sparks slow motion")],
+      [5,"Fighters recovering after a heavy cut: the overshoot and the return to guard",yt("longsword sparring slow motion")]]},
+  greatsword:{name:"Longsword",kind:"melee",style:"footman",vx:2.95,weapon:{type:"sword",len:0.98,pommel:0.2,lhand:-0.15,big:true},fx:"sparks",react:{amp:16,push:0.1},
+    cards:["Start guard","Contact (Langort)","End guard"],
+    note:"Meyer's square: every cut is a straight line through the target, long edge leading, both hands on the grip, arms fully extended at contact. The cut does not stop at the body; it passes through and ends in a guard on the far side, and that end guard is where the next cut starts. That is why the old animation reads as half-sword: short pokes that stop at the target with a hand near the blade.",
+    poses:p=>{
+      const idle={lean:0,hx:0,hy:0,head:0,sR:40,eR:60,sL:0,eL:0,sw:112};
+      if(p.variant==="Unterhau")return {idle,
+        coil:{lean:6,hx:-0.06,hy:0.04,head:-4,sR:-30,eR:24,sL:0,eL:0,sw:296},
+        release:{lean:-12,hx:0.13,hy:0.05,head:6,sR:92,eR:0,sL:0,eL:0,sw:118}};
+      if(p.variant==="Scheitelhau")return {idle,
+        coil:{lean:10,hx:-0.05,hy:0.03,head:-8,sR:178,eR:22,sL:0,eL:0,sw:192},
+        release:{lean:-16,hx:0.14,hy:0.06,head:8,sR:100,eR:0,sL:0,eL:0,sw:96}};
+      return {idle,
+        coil:{lean:9,hx:-0.06,hy:0.04,head:-6,sR:150,eR:55,sL:0,eL:0,sw:212},
+        release:{lean:-15,hx:0.14,hy:0.06,head:8,sR:98,eR:0,sL:0,eL:0,sw:100}};},
+    recoil:p=>{
+      if(p.variant==="Unterhau")return {lean:-4,hx:0.15,hy:0.03,head:2,sR:160,eR:30,sL:0,eL:0,sw:188};
+      if(p.variant==="Scheitelhau")return {lean:-20,hx:0.17,hy:0.07,head:10,sR:50,eR:8,sL:0,eL:0,sw:60};
+      return {lean:-18,hx:0.17,hy:0.06,head:8,sR:22,eR:10,sL:0,eL:0,sw:292};},
+    params:[
+      {k:"variant",label:"Line of cut",type:"choice",options:["Oberhau","Scheitelhau","Unterhau"],def:"Oberhau",beat:0,help:"Oberhau: high diagonal, ends low behind. Scheitelhau: straight down from the scalp. Unterhau: rising from below. The side view cannot show the horizontal Mittelhau."},
+      {k:"windup",label:"Into the guard",unit:"s",min:.15,max:1.2,step:.01,def:.6,beat:1,help:"From the low guard up into the cutting guard, hips loading."},
+      {k:"hold",label:"Hold in the guard",unit:"frames",min:0,max:8,step:1,def:3,beat:1,help:"The god reads the cut from here."},
+      {k:"strike",label:"Cut to contact",unit:"frames",min:1,max:8,step:1,def:4,beat:2,help:"A step with the cut, arms extending to full length."},
+      {k:"trail",label:"Weapon trail",unit:"frames",min:0,max:14,step:1,def:9,beat:2,help:"A long blade wants a long arc."},
+      {k:"hitstop",label:"Hitstop, both units",unit:"ms",min:0,max:200,step:5,def:80,beat:4,help:"Blade bites, both freeze."},
+      {k:"flinch",label:"Victim reaction",unit:"×",min:0,max:2,step:.05,def:1.2,beat:4,help:"A heavier blade throws him further."},
+      {k:"follow",label:"Cut passes through",unit:"s",min:.05,max:.4,step:.01,def:.16,beat:5,help:"The blade keeps going through the line into the end guard."},
+      {k:"endHold",label:"Hold the end guard",unit:"frames",min:0,max:12,step:1,def:4,beat:5,help:"The extreme after the cut. Where the next cut would start."},
+      {k:"recover",label:"Back to guard",unit:"s",min:.15,max:1.4,step:.01,def:.7,beat:5,help:"Slow out: the weight of a long blade."},P_EXAG],
+    refs:[[1,"Joachim Meyer's cutting square, drilled by HEMA clubs: the guards each cut starts and ends in",yt("Meyer square longsword drill")],
+      [2,"Longsword cutting from Vom Tag: the step, both hands on the grip, arms extending to Langort",yt("longsword vom tag oberhau cut")],
+      [4,"Test cutting with a longsword: the blade passing through a mat without stopping",yt("longsword test cutting slow motion")],
+      [5,"The cut ending in Alber or Wechsel, point low, ready to rise into the next cut",yt("longsword wechsel alber guard")]]},
+  spear:{name:"Spear",kind:"melee",style:"footman",vx:3.05,weapon:{type:"spear",fwd:1.05,back:0.38,lhand:0.34},fx:"bone",react:{amp:12,push:0.13},
+    cards:["Drawn back","Lunge","Withdraw"],
+    poses:p=>({idle:{lean:0,hx:0,hy:0,head:0,sR:30,eR:55,sL:0,eL:0,sw:96},
+      coil:{lean:10,hx:-0.10,hy:0.05,head:-4,sR:-25,eR:85,sL:0,eL:0,sw:92},
+      release:{lean:-18,hx:0.10+p.lunge/100*2,hy:0.08,head:8,sR:86,eR:4,sL:0,eL:0,sw:95}}),
+    recoil:p=>({lean:-8+p.recoil,hx:0.06+p.lunge/100,hy:0.05,head:3,sR:40,eR:45,sL:0,eL:0,sw:97}),
+    params:[
+      {k:"windup",label:"Draw back",unit:"s",min:.15,max:1.2,step:.01,def:.55,beat:1,help:"Spear pulled back, weight onto the back foot."},
+      {k:"hold",label:"Hold",unit:"frames",min:0,max:8,step:1,def:3,beat:1,help:"The coiled spring."},
+      {k:"strike",label:"Thrust",unit:"frames",min:1,max:8,step:1,def:3,beat:2,help:"The body stretches along the line of the spear."},
+      {k:"lunge",label:"Lunge distance",unit:"% height",min:0,max:15,step:.5,def:7,beat:2,help:"How far the whole body travels with the thrust."},
+      {k:"hitstop",label:"Hitstop, both units",unit:"ms",min:0,max:200,step:5,def:70,beat:4,help:"Point bites, both freeze."},
+      {k:"flinch",label:"Victim reaction",unit:"×",min:0,max:2,step:.05,def:1,beat:4,help:"Shoved back along the spear's line."},
+      {k:"recoil",label:"Withdraw",unit:"% height",min:0,max:10,step:.5,def:3,beat:5,help:"Pulling the point back out."},
+      {k:"recover",label:"Back to guard",unit:"s",min:.15,max:1.2,step:.01,def:.55,beat:5,help:"Settles behind the point again."},P_EXAG],
+    refs:[[1,"Spear and pike drills: the rear hand drawing back, the weight shift",yt("spear thrust drill HEMA")],
+      [2,"A fast spear lunge: the whole body moving along the shaft's line",yt("spear lunge slow motion")],
+      [4,"A point hitting a target dummy: the shove along the line, the dummy rocking back",yt("spear thrust target slow motion")]]},
+  shield:{name:"Shield",kind:"melee",style:"footman",vx:2.55,weapon:{type:"sword",len:0.62},shield:true,fx:"sparks",react:{amp:13,push:0.08},
+    cards:["Guard and raise","Contact","Recover"],
+    poses:p=>{
+      const idle={lean:0,hx:0,hy:0,head:0,sR:30,eR:70,sL:84,eL:8,sw:150};
+      if(p.variant==="Shield bash")return {idle,
+        coil:{lean:9,hx:-0.06,hy:0.05,head:-4,sR:22,eR:65,sL:48,eL:70,sw:160},
+        release:{lean:-20,hx:0.17,hy:0.06,head:6,sR:28,eR:70,sL:96,eL:0,sw:150}};
+      return {idle,
+        coil:{lean:8,hx:-0.04,hy:0.04,head:-5,sR:170,eR:50,sL:80,eL:14,sw:245},
+        release:{lean:-12,hx:0.09,hy:0.05,head:7,sR:106,eR:0,sL:68,eL:32,sw:82}};},
+    recoil:p=>({lean:-4+p.recoil,hx:0.05,hy:0.03,head:2,sR:60,eR:40,sL:80,eL:12,sw:110}),
+    params:[
+      {k:"variant",label:"Finish",type:"choice",options:["Strike over shield","Shield bash"],def:"Strike over shield",beat:0,help:"The shield stays out front at face height until the attack; the blade goes over it, or the shield itself is the blow."},
+      {k:"windup",label:"Wind-up",unit:"s",min:.15,max:1.2,step:.01,def:.55,beat:1,help:"Sword raised over the shield, or the shield tucked in to shove."},
+      {k:"hold",label:"Hold",unit:"frames",min:0,max:8,step:1,def:3,beat:1,help:"Behind the shield, ready."},
+      {k:"strike",label:"Strike",unit:"frames",min:1,max:8,step:1,def:3,beat:2,help:"Over the top, or the shove."},
+      {k:"hitstop",label:"Hitstop, both units",unit:"ms",min:0,max:200,step:5,def:70,beat:4,help:"Both freeze on contact."},
+      {k:"flinch",label:"Victim reaction",unit:"×",min:0,max:2,step:.05,def:1,beat:4,help:"A bash shoves further than a cut."},
+      {k:"recoil",label:"Bounce off the hit",unit:"% height",min:0,max:10,step:.5,def:2,beat:5,help:"The rebound."},
+      {k:"recover",label:"Back behind the shield",unit:"s",min:.15,max:1.2,step:.01,def:.6,beat:5,help:"Shield back up at face height."},P_EXAG],
+    refs:[[1,"Sword and shield HEMA: the shield held out in front, the sword chambered above it",yt("sword and shield HEMA sparring")],
+      [2,"Shield bash in reenactment combat: the shove and the step behind it",yt("shield bash reenactment slow motion")],
+      [4,"Shield wall impacts in full-contact medieval combat",yt("shield wall impact buhurt")]]},
+  bow:{name:"Bow",kind:"ranged",style:"robe2",weapon:{type:"bow"},proj:{type:"arrow",len:0.62},fx:"thunk",react:{amp:9,push:0.03},
+    cards:["Full draw","Release","Follow-through"],
+    poses:()=>({idle:{lean:0,hx:0,hy:0,head:0,sR:15,eR:30,sL:35,eL:15,sw:50},
+      coil:{lean:6,hx:-0.03,hy:0.02,head:-3,sR:-60,eR:150,sL:92,eL:0,sw:92},
+      release:{lean:2,hx:-0.01,hy:0.02,head:-1,sR:-100,eR:140,sL:88,eL:3,sw:90}}),
+    recoil:p=>({lean:1+p.recoil*0.6,hx:-0.01,hy:0.01,head:0,sR:-70,eR:110,sL:74,eL:8,sw:84}),
+    params:[
+      {k:"windup",label:"Draw",unit:"s",min:.2,max:1.4,step:.01,def:.8,beat:1,help:"Nock, raise, draw to the cheek. The string creaks."},
+      {k:"hold",label:"Hold at full draw",unit:"frames",min:0,max:12,step:1,def:6,beat:1,help:"Aiming. The bow arm stays dead still."},
+      {k:"strike",label:"Release",unit:"frames",min:1,max:4,step:1,def:1,beat:2,help:"The string hand flies back past the ear."},
+      {k:"recoil",label:"Bow arm kick",unit:"% height",min:0,max:10,step:.5,def:3,beat:2,help:"The bow jumps forward and drops a little."},
+      {k:"speed",label:"Arrow speed",unit:"bodies/s",min:5,max:30,step:.5,def:14,beat:3,help:"Fast, but slow enough to see the arc."},
+      {k:"arc",label:"Arc height",unit:"bodies",min:0,max:1,step:.05,def:.3,beat:3,help:"Arrows drop; the shaft turns to follow its path."},
+      {k:"hitstop",label:"Hitstop on victim",unit:"ms",min:0,max:150,step:5,def:40,beat:4,help:"A small one. Arrows are a tier 1 to 3 hit."},
+      {k:"flinch",label:"Victim reaction",unit:"×",min:0,max:2,step:.05,def:.8,beat:4,help:"A tick or small flinch."},
+      {k:"aftermath",label:"Shaft wobble",unit:"s",min:.3,max:3,step:.1,def:1.2,beat:5,help:"The arrow quivers in the target and settles."},
+      {k:"recover",label:"Back to rest",unit:"s",min:.15,max:1.2,step:.01,def:.5,beat:5,help:"Lower the bow, reach for the next arrow."},P_EXAG],
+    refs:[[1,"Longbow and recurve draws in slow motion: the anchor at the cheek, the back muscles taking the weight",yt("longbow draw slow motion archer")],
+      [2,"The release: string hand flying back, bow arm jumping, the string slapping forward",yt("archery release slow motion string")],
+      [3,"The archer's paradox: the arrow flexing as it leaves, then flying true",yt("archer's paradox slow motion")],
+      [5,"An arrow hitting a target and quivering",yt("arrow hitting target slow motion vibration")]]},
+  crossbow:{name:"Crossbow",kind:"ranged",style:"footman",weapon:{type:"crossbow",lhand:0.18},proj:{type:"bolt",len:0.36},fx:"thunk",react:{amp:13,push:0.08},reload:true,
+    cards:["Aim","Kick","Settle"],
+    poses:()=>({idle:{lean:0,hx:0,hy:0,head:0,sR:30,eR:40,sL:0,eL:0,sw:70},
+      coil:{lean:0,hx:0,hy:0.02,head:5,sR:62,eR:60,sL:0,eL:0,sw:90},
+      release:{lean:9,hx:-0.04,hy:0.02,head:-5,sR:74,eR:52,sL:0,eL:0,sw:103}}),
+    recoil:p=>({lean:2+p.recoil*0.5,hx:-0.02,hy:0.02,head:2,sR:62,eR:58,sL:0,eL:0,sw:93}),
+    reloadPose:{lean:-16,hx:0.02,hy:0.08,head:10,sR:22,eR:70,sL:0,eL:0,sw:18},
+    params:[
+      {k:"windup",label:"Raise and aim",unit:"s",min:.15,max:1.2,step:.01,def:.45,beat:1,help:"Stock to the shoulder, cheek down."},
+      {k:"hold",label:"Hold the aim",unit:"frames",min:0,max:12,step:1,def:4,beat:1,help:"Short and mechanical. Always fires at max range."},
+      {k:"strike",label:"Trigger",unit:"frames",min:1,max:4,step:1,def:1,beat:2,help:"No motion to speak of; the kick is the beat."},
+      {k:"recoil",label:"Kick",unit:"% height",min:0,max:10,step:.5,def:4,beat:2,help:"Into the shoulder, nose rises."},
+      {k:"speed",label:"Bolt speed",unit:"bodies/s",min:8,max:40,step:.5,def:22,beat:3,help:"Fast and flat."},
+      {k:"hitstop",label:"Hitstop on victim",unit:"ms",min:0,max:150,step:5,def:60,beat:4,help:"Heavier than an arrow."},
+      {k:"flinch",label:"Victim reaction",unit:"×",min:0,max:2,step:.05,def:1.1,beat:4,help:"A stagger, not a tick."},
+      {k:"recover",label:"Settle",unit:"s",min:.15,max:1.2,step:.01,def:.45,beat:5,help:"Back off the shoulder."},
+      {k:"reload",label:"Reload (countdown)",unit:"s",min:1,max:8,step:.1,def:3,beat:5,help:"Nose down, spanning the string. The ring above shows it."},P_EXAG],
+    refs:[[1,"Medieval crossbow shooting: the stock at the shoulder, the cheek weld",yt("medieval crossbow shooting")],
+      [2,"Crossbow release in slow motion: the prod snapping forward, the kick",yt("crossbow release slow motion")],
+      [5,"Spanning a crossbow with a stirrup or goat's foot lever",yt("spanning crossbow goats foot lever")]]},
+  musket:{name:"Musket",kind:"ranged",style:"footman",weapon:{type:"musket",lhand:0.36},proj:{type:"shot"},fx:"musket",react:{amp:12,push:0.07},reload:true,pan:true,
+    cards:["Aim","Kick","Settle"],
+    poses:()=>({idle:{lean:0,hx:0,hy:0,head:0,sR:30,eR:40,sL:0,eL:0,sw:60},
+      coil:{lean:-2,hx:0.01,hy:0.03,head:5,sR:62,eR:58,sL:0,eL:0,sw:90},
+      release:{lean:14,hx:-0.07,hy:0.03,head:-8,sR:78,eR:48,sL:0,eL:0,sw:108}}),
+    recoil:p=>({lean:3+p.recoil*0.5,hx:-0.04,hy:0.03,head:1,sR:64,eR:56,sL:0,eL:0,sw:94}),
+    reloadPose:{lean:-4,hx:0,hy:0.02,head:6,sR:20,eR:62,sL:0,eL:0,sw:178},
+    params:[
+      {k:"windup",label:"Raise and aim",unit:"s",min:.15,max:1.2,step:.01,def:.5,beat:1,help:"Musket up, cheek down on the stock."},
+      {k:"hold",label:"Hold the aim",unit:"frames",min:0,max:12,step:1,def:5,beat:1,help:"The line waits."},
+      {k:"strike",label:"Trigger",unit:"frames",min:1,max:4,step:1,def:2,beat:2,help:"The lock snaps down."},
+      {k:"hangfire",label:"Pan flash before the shot",unit:"ms",min:0,max:200,step:5,def:90,beat:2,help:"A flintlock's natural anticipation: flash in the pan, then the bang."},
+      {k:"recoil",label:"Kick",unit:"% height",min:0,max:12,step:.5,def:7,beat:2,help:"Shoulder thrown back, muzzle up."},
+      {k:"speed",label:"Ball speed",unit:"bodies/s",min:15,max:80,step:1,def:40,beat:3,help:"Near instant; the puff trail sells it."},
+      {k:"hitstop",label:"Hitstop on victim",unit:"ms",min:0,max:150,step:5,def:70,beat:4,help:"A hard knock."},
+      {k:"flinch",label:"Victim reaction",unit:"×",min:0,max:2,step:.05,def:1,beat:4,help:"Knocked back a step."},
+      {k:"aftermath",label:"Smoke hangs",unit:"s",min:1,max:6,step:.1,def:3.5,beat:5,help:"The cloud drifts over the line for seconds."},
+      {k:"recover",label:"Settle",unit:"s",min:.15,max:1.2,step:.01,def:.5,beat:5,help:"Back down from the kick."},
+      {k:"reload",label:"Reload (countdown)",unit:"s",min:1,max:12,step:.1,def:5,beat:5,help:"Musket upright, ramrod. The ring above shows it."},P_EXAG],
+    refs:[[1,"Flintlock musket drill: the present, the cheek on the stock",yt("brown bess musket drill reenactment")],
+      [2,"Flintlock firing in slow motion: flash in the pan, the short delay, the main charge",yt("flintlock musket firing slow motion pan flash")],
+      [5,"A volley's smoke hanging over a line of reenactors",yt("musket volley smoke reenactment")]]}
+};
+const THROWP=ATK.fireball.poses, THROWK=ATK.fireball.recoil;
+const sp=(k,label,unit,min,max,step,def,beat,help)=>({k,label,unit,min,max,step,def,beat,help});
+Object.assign(ATK,{
+  blood:{name:"Blood bolt",kind:"ranged",style:"deadrobe",school:"blood",victim:"footman",proj:{type:"orb"},bolt:{gather:"drops",shape:"blood",impact:"splash",after:"drain"},react:{amp:13,push:0.08},
+    cards:["Coil","Throw","Recoil"],caster:"Blood mage (BloodBolt_Data)",poses:THROWP,recoil:THROWK,
+    params:[sp("windup","Gather","s",.15,1.2,.01,.7,1,"Blood is drawn up out of the ground into his hand and swells into a wobbling ball."),
+      sp("hold","Hold at the coil","frames",0,8,1,4,1,"The heavy ball held back, trembling."),
+      sp("strike","Throw","frames",1,8,1,2,2,"Overhand."),sp("recoil","Caster recoil","% height",0,10,.5,4,2,"Pushed back by his own throw."),
+      sp("speed","Ball speed","bodies/s",3,20,.5,9,3,"Slower than fire: it is heavy liquid."),sp("arc","Arc height","bodies",0,1,.05,.25,3,"It droops."),
+      sp("wobble","Wobble","",0,1,.05,.5,3,"A water balloon in flight: it jiggles and drips."),
+      sp("hitstop","Hitstop on victim","ms",0,200,5,80,4,"Splash, freeze, shove."),sp("flinch","Victim reaction","×",0,2,.05,1,4,"Lean and shove away."),
+      sp("drain","Lifesteal return","s",.2,2.5,.05,.9,5,"Blood streams from the victim back into the caster's hand. This IS the lifesteal, shown."),
+      sp("recover","Caster recovery","s",.15,1.2,.01,.5,5,"Settles back."),P_EXAG],
+    refs:[[1,"Liquid pulled upward in reverse slow motion: droplets rising and merging",yt("water droplets reverse slow motion merging")],
+      [3,"A water balloon in flight: the wobble, the jiggle, the drips",yt("water balloon flight slow motion")],
+      [4,"A water balloon bursting on impact: the splash fan and the drops falling back",yt("water balloon burst impact slow motion")],
+      [5,"Practical film blood splatter on a wall and the ground",yt("practical blood squib slow motion")]]},
+  plague:{name:"Rot bolt",kind:"ranged",style:"deadrobe",school:"plague",victim:"footman",proj:{type:"orb"},bolt:{gather:"flies",shape:"glob",impact:"cloud",after:"cloud"},react:{amp:8,push:0.03},
+    cards:["Scoop","Lob","Follow-through"],caster:"Plague mage (RotBolt_Data)",
+    poses:()=>({idle:{lean:0,hx:0,hy:0,head:0,sR:18,eR:35,sL:-8,eL:25},
+      coil:{lean:-4,hx:-0.03,hy:0.07,head:5,sR:-45,eR:25,sL:35,eL:20},
+      release:{lean:6,hx:0.05,hy:0.02,head:-7,sR:150,eR:10,sL:-20,eL:22}}),
+    recoil:p=>({lean:3+p.recoil*0.8,hx:0.02,hy:0.02,head:-3,sR:120,eR:25,sL:-10,eL:25}),
+    params:[sp("windup","Gather","s",.15,1.2,.01,.6,1,"Flies and green motes swarm into the hand; a lumpy glob forms."),
+      sp("hold","Hold low","frames",0,8,1,3,1,"Scooped low, ready to lob."),
+      sp("strike","Lob","frames",1,8,1,3,2,"Underhand, so it reads differently from every overhand bolt."),sp("recoil","Follow-through","% height",0,10,.5,2,2,"The arm finishes high."),
+      sp("speed","Glob speed","bodies/s",2,15,.5,6,3,"Slow and lazy."),sp("arc","Arc height","bodies",0,1.5,.05,.7,3,"A high lob that drops onto them."),
+      sp("hitstop","Hitstop on victim","ms",0,150,5,30,4,"Barely any: this is not about the blow."),sp("flinch","Victim reaction","×",0,2,.05,.6,4,"He gags rather than reels."),
+      sp("cloud","Poison cloud lingers","s",.5,6,.1,3,5,"The glob bursts into a low green haze that sits on him. The poison is the cloud."),
+      sp("recover","Caster recovery","s",.15,1.2,.01,.5,5,"Settles back."),P_EXAG],
+    refs:[[1,"Flies swarming in slow motion",yt("flies swarming slow motion")],
+      [2,"An underhand lob of a mud ball",yt("mud ball throw slow motion")],
+      [4,"A green smoke bomb going off and the haze hanging low",yt("green smoke grenade slow motion")],
+      [5,"Ground fog creeping and settling",yt("ground fog rolling timelapse")]]},
+  bone:{name:"Bone shards",kind:"ranged",style:"deadrobe",school:"bone",victim:"footman",proj:{type:"orb"},bolt:{gather:"chips",shape:"shard",impact:"stick",after:"crumble",count:3},react:{amp:10,push:0.05},
+    cards:["Shards assemble","Fling","Follow-through"],caster:"Necromancer (BoneShard_Data)",
+    poses:()=>({idle:{lean:0,hx:0,hy:0,head:0,sR:18,eR:35,sL:-8,eL:25},
+      coil:{lean:10,hx:-0.05,hy:0.04,head:-6,sR:-110,eR:95,sL:60,eL:20},
+      release:{lean:-10,hx:0.07,hy:0.03,head:6,sR:105,eR:0,sL:-30,eL:25}}),
+    recoil:p=>({lean:p.recoil*1.2,hx:0.02,hy:0.02,head:0,sR:80,eR:15,sL:-15,eL:25}),
+    params:[sp("windup","Gather","s",.15,1.2,.01,.55,1,"Bone chips lift off the ground and lock into a fan of three shards at his hand."),
+      sp("hold","Hold the fan","frames",0,8,1,3,1,"Three points aimed."),
+      sp("strike","Fling","frames",1,8,1,2,2,"One flick of the arm."),sp("recoil","Follow-through","% height",0,10,.5,3,2,""),
+      sp("stagger","Volley spacing","ms",0,150,5,60,3,"The three shards leave one after another, a rattle not a single blow."),
+      sp("speed","Shard speed","bodies/s",8,35,.5,18,3,"Fast and flat, point first."),
+      sp("hitstop","Hitstop on victim","ms",0,150,5,50,4,"On the first shard."),sp("flinch","Victim reaction","×",0,2,.05,.8,4,"Pinned flinches."),
+      sp("crumble","Shards crumble","s",.3,3,.1,1.2,5,"They stick in him like arrows, then crumble to dust."),
+      sp("recover","Caster recovery","s",.15,1.2,.01,.45,5,""),P_EXAG],
+    refs:[[2,"Throwing knives in slow motion: the flick and the point-first flight",yt("throwing knives slow motion")],
+      [4,"Knives sticking into a target one after another",yt("knife throwing target rapid slow motion")],
+      [5,"Chalk or plaster crumbling to dust",yt("chalk crumbling slow motion")]]},
+  frost:{name:"Frost bolt",kind:"ranged",style:"deadrobe",school:"frost",victim:"footman",proj:{type:"orb"},bolt:{gather:"frost",shape:"crystal",impact:"freeze",after:"thaw"},react:{amp:12,push:0.04},
+    cards:["Coil","Throw","Recoil"],caster:"Wraith (FrostBolt_Data)",poses:THROWP,recoil:THROWK,
+    params:[sp("windup","Gather","s",.15,1.2,.01,.6,1,"Frost crystallises on the palm; a spinning star of ice grows."),
+      sp("hold","Hold at the coil","frames",0,8,1,3,1,""),sp("strike","Throw","frames",1,8,1,2,2,""),sp("recoil","Caster recoil","% height",0,10,.5,4,2,""),
+      sp("speed","Bolt speed","bodies/s",3,25,.5,11,3,"Sharp and quick, shedding snow."),sp("stretch","Stretch at speed","",0,1,.05,.2,3,"Ice is hard: barely any."),
+      sp("hitstop","Hitstop on victim","ms",0,200,5,90,4,"Shatter and freeze."),sp("flinch","Victim reaction","×",0,2,.05,1,4,""),
+      sp("frozen","Frozen in place","s",.1,2,.05,.6,5,"Ice grows around his feet, holds him, then cracks off."),
+      sp("recover","Caster recovery","s",.15,1.2,.01,.5,5,""),P_EXAG],
+    refs:[[1,"Frost forming on a cold surface",yt("frost forming timelapse macro")],
+      [4,"Ice shattering in slow motion",yt("ice shatter slow motion")],
+      [5,"Ice cracking off and melting away",yt("ice cracking melting timelapse")]]},
+  arcane:{name:"Arcane missile",kind:"ranged",style:"robe",school:"arcane",proj:{type:"orb"},bolt:{gather:"ring",shape:"mote",impact:"burst",after:null},react:{amp:6,push:0.02},
+    cards:["Coil","Flick","Recoil"],caster:"Wizard's magic missile (ArcaneBolt_Data, homes, cannot miss)",poses:THROWP,recoil:THROWK,
+    params:[sp("windup","Gather","s",.1,1,.01,.3,1,"Five motes orbit the fingertips. Small on purpose: it is a tier 2 attack."),
+      sp("hold","Hold","frames",0,8,1,1,1,""),sp("strike","Flick","frames",1,6,1,2,2,""),sp("recoil","Caster recoil","% height",0,10,.5,1.5,2,""),
+      sp("speed","Missile speed","bodies/s",3,25,.5,10,3,""),sp("curve","Homing curve","bodies",0,1.5,.05,.55,3,"It bends onto its man. The curve is the whole read of a seeker."),
+      sp("stretch","Stretch at speed","",0,1,.05,.5,3,""),
+      sp("hitstop","Hitstop on victim","ms",0,100,5,20,4,"Tiny: guaranteed and unremarkable."),sp("flinch","Victim reaction","×",0,2,.05,.4,4,"A tick."),
+      sp("recover","Caster recovery","s",.15,1.2,.01,.35,5,""),Object.assign({},P_EXAG,{def:.7})],
+    refs:[[1,"Sparkler trails in slow motion",yt("sparkler slow motion")],[3,"Light painting long exposure arcs",yt("light painting long exposure arcs")]]},
+  chain:{name:"Chain lightning",kind:"ranged",style:"robe",school:"storm",chain:true,extra:2.3,vx:3.7,react:{amp:14,push:0.04},
+    cards:["Charge","Release","Recoil"],caster:"Wizard (ChainBolt)",
+    poses:()=>({idle:{lean:0,hx:0,hy:0,head:0,sR:18,eR:35,sL:-8,eL:25},
+      coil:{lean:12,hx:-0.05,hy:0.05,head:-6,sR:-70,eR:95,sL:-60,eL:95},
+      release:{lean:-12,hx:0.08,hy:0.03,head:6,sR:88,eR:0,sL:84,eL:4}}),
+    recoil:p=>({lean:2+p.recoil*1.6,hx:-p.recoil*0.015,hy:0.02,head:-p.recoil,sR:65,eR:20,sL:60,eL:22}),
+    params:[sp("windup","Charge","s",.15,1.2,.01,.6,1,"Arcs crawl over both hands and up the arms."),
+      sp("hold","Hold","frames",0,8,1,3,1,"Crackling."),sp("strike","Release","frames",1,4,1,1,2,"Both hands thrust."),
+      sp("recoil","Caster recoil","% height",0,10,.5,5,2,"The discharge kicks him back."),
+      sp("hop","Hop delay","ms",20,250,5,80,3,"The wait between men. It walks, it does not explode."),
+      sp("falloff","Weaker each hop","%",0,70,1,30,3,"Thinner bolt, smaller flash, smaller flinch per hop."),
+      sp("hitstop","Hitstop per man","ms",0,150,5,60,4,""),sp("flinch","Victim reaction","×",0,2,.05,1.2,4,""),
+      sp("aftermath","Smoke on the struck","s",.3,3,.1,1,5,""),sp("recover","Caster recovery","s",.15,1.2,.01,.5,5,""),P_EXAG],
+    refs:[[1,"Tesla coil arcs in slow motion",yt("tesla coil arcs slow motion")],[3,"Lightning strike branching in slow motion",yt("lightning strike slow motion branching")],[2,"A Jacob's ladder arc",yt("jacobs ladder arc slow motion")]]},
+  smite:{name:"Smite",kind:"ranged",style:p=>p.variant==="Wither (dead)"?"deadrobe":"priest",school:"holy",victim:p=>p.variant==="Wither (dead)"?"footman":"bone",react:{amp:15,push:0.05},
+    cards:["Call","Strike","Recover"],caster:"Priest (OrderSpells.Smite); the dead side's Wither drains",
+    poses:p=>p.variant==="Wither (dead)"?({idle:{lean:0,hx:0,hy:0,head:0,sR:18,eR:35,sL:-8,eL:25},
+        coil:{lean:-6,hx:0.04,hy:0.02,head:5,sR:95,eR:15,sL:82,eL:28},
+        release:{lean:12,hx:-0.06,hy:0.06,head:-7,sR:45,eR:105,sL:35,eL:105}})
+      :({idle:{lean:0,hx:0,hy:0,head:0,sR:18,eR:35,sL:-8,eL:25},
+        coil:{lean:10,hx:-0.02,hy:-0.02,head:-15,sR:170,eR:10,sL:165,eL:14},
+        release:{lean:-10,hx:0.05,hy:0.04,head:6,sR:100,eR:0,sL:35,eL:30}}),
+    recoil:p=>p.variant==="Wither (dead)"?{lean:10,hx:-0.05,hy:0.05,head:-6,sR:48,eR:100,sL:38,eL:100}:{lean:-4,hx:0.03,hy:0.03,head:2,sR:80,eR:20,sL:20,eL:30},
+    params:[{k:"variant",label:"Side",type:"choice",options:["Holy light (living)","Wither (dead)"],def:"Holy light (living)",beat:0,help:"The living priest calls a shaft of light down on one man. The dead side's version draws a thread out of him into the caster's hands and keeps what it takes."},
+      sp("windup","Call","s",.15,1.4,.01,.7,1,"Light: arms raised, a ring narrows on the target's ground (the telegraph). Wither: a claw reaches out."),
+      sp("hold","Hold","frames",0,10,1,4,1,""),sp("strike","Strike","frames",1,6,1,2,2,"Light: the shaft falls. Wither: the hand clenches and pulls."),
+      sp("hitstop","Hitstop on victim","ms",0,200,5,90,4,""),sp("flinch","Victim reaction","×",0,2,.05,1.1,4,""),
+      sp("channel","Drain channel (Wither)","s",.2,2.5,.05,.9,5,"How long the thread holds and blood flows to the caster."),
+      sp("aftermath","Haze and motes","s",.5,4,.1,1.5,5,""),sp("recover","Caster recovery","s",.15,1.2,.01,.55,5,""),P_EXAG],
+    refs:[[1,"Crepuscular rays breaking through cloud",yt("sun rays through clouds timelapse")],[2,"A magnesium or flash powder practical flash",yt("flash powder practical effect slow motion")],[5,"Ink drawn through water (for Wither's thread)",yt("ink in water slow motion")]]}
+});
+const KEYMAP={windup:"windupSeconds",hold:"holdFrames",strike:"strikeFrames",hitstop:"hitstopVictimMs",recoil:"recoilBodyHeightPct",recover:"recoverySeconds",exag:"poseExaggeration",flinch:"victimReactionScale",speed:"projectileSpeedBodiesPerSecond",stretch:"projectileStretch",aftermath:"aftermathSeconds",interval:"crystalIntervalMs",grow:"crystalGrowFrames",overshoot:"crystalOvershootPct",shatterHold:"frozenHoldSeconds",trail:"trailFrames",arc:"projectileArcBodyHeights",reload:"reloadSeconds",hangfire:"panFlashLeadMs",follow:"followThroughSeconds",endHold:"endGuardHoldFrames",lunge:"lungeBodyHeightPct",variant:"variant",wobble:"wobbleAmount",cloud:"poisonCloudSeconds",stagger:"volleySpacingMs",crumble:"stuckSeconds",frozen:"frozenSeconds",curve:"homingCurveBodyHeights",hop:"hopDelayMs",falloff:"hopFalloffPct",drain:"lifestealReturnSeconds",channel:"drainChannelSeconds"};
+
+// ---------- state ----------
+const reduce=matchMedia("(prefers-reduced-motion: reduce)").matches;
+const st={tab:"fireball",mode:"five",view:"close",onion:false,sound:false,playing:!reduce,rate:1,t:0};
+const P={};
+const SHIPPED={"crossbow": {"hitstop": 85, "hold": 8, "exag": 1, "speed": 30, "recoil": 2.5, "recover": 0.45, "reload": 3, "strike": 2, "flinch": 1.3, "windup": 0.58}, "chain": {"aftermath": 1.8, "hitstop": 10, "hold": 6, "hop": 145, "falloff": 29, "exag": 1, "recoil": 2.5, "recover": 0.38, "strike": 3, "flinch": 1.6, "windup": 0.72}, "musket": {"aftermath": 4.3, "hitstop": 140, "hold": 10, "hangfire": 160, "exag": 1, "speed": 65, "recoil": 10, "recover": 0.68, "reload": 5, "strike": 3, "flinch": 1.9, "windup": 0.42}, "greatsword": {"endHold": 9, "follow": 0.35, "hitstop": 15, "hold": 7, "exag": 1.1, "recover": 0.38, "strike": 3, "trail": 12, "variant": "Oberhau", "flinch": 1.35, "windup": 0.37}, "plague": {"hitstop": 75, "hold": 7, "cloud": 4.5, "exag": 1.15, "arc": 0.3, "speed": 2, "recoil": 2.5, "recover": 0.3, "strike": 4, "flinch": 0.35, "windup": 1.04}, "sword": {"hitstop": 70, "hold": 2, "exag": 0.7, "recoil": 1.5, "recover": 0.54, "strike": 3, "trail": 6, "flinch": 0.65, "windup": 0.34}, "shield": {"hitstop": 140, "hold": 1, "exag": 1, "recoil": 5.5, "recover": 0.29, "strike": 6, "variant": "Strike over shield", "flinch": 0.75, "windup": 0.78}, "blood": {"hitstop": 80, "hold": 4, "drain": 1.2, "exag": 1, "arc": 0.35, "speed": 5.5, "recoil": 5, "recover": 0.5, "strike": 2, "flinch": 1, "windup": 0.87, "wobble": 0.75}, "bow": {"aftermath": 1.6, "hitstop": 40, "hold": 11, "exag": 1, "arc": 0.35, "speed": 15.5, "recoil": 7.5, "recover": 0.5, "strike": 2, "flinch": 0.35, "windup": 0.67}, "arcane": {"hitstop": 15, "hold": 5, "curve": 1.25, "exag": 0.6, "speed": 5, "stretch": 0.1, "recoil": 0.5, "recover": 0.32, "strike": 2, "flinch": 0.3, "windup": 0.31}, "frost": {"frozen": 1, "hitstop": 145, "hold": 2, "exag": 1.1, "speed": 12, "stretch": 0.7, "recoil": 5.5, "recover": 0.37, "strike": 2, "flinch": 0.7, "windup": 0.75}, "ice": {"aftermath": 1.8, "grow": 4, "interval": 79, "overshoot": 19, "shatterHold": 0.45, "hitstop": 100, "hold": 6, "exag": 1, "recoil": 3, "recover": 0.55, "strike": 6, "windup": 0.66}, "bone": {"hitstop": 100, "hold": 4, "exag": 1, "speed": 13.5, "recoil": 5.5, "recover": 0.33, "strike": 3, "crumble": 2.2, "flinch": 1.1, "stagger": 95, "windup": 1.02}, "fireball": {"aftermath": 2.2, "hitstop": 80, "hold": 4, "exag": 1.15, "speed": 13, "stretch": 0.85, "recoil": 4.5, "recover": 0.45, "strike": 2, "flinch": 1, "windup": 0.79}, "smite": {"aftermath": 1.5, "channel": 0.9, "hitstop": 50, "hold": 2, "exag": 0.95, "recover": 0.55, "strike": 5, "variant": "Holy light (living)", "flinch": 1.1, "windup": 1.27}, "spear": {"hitstop": 35, "hold": 1, "lunge": 8.5, "exag": 1, "recoil": 1.5, "recover": 0.22, "strike": 6, "flinch": 1, "windup": 0.66}};
+function defaults(id){const o={};for(const q of ATK[id].params)o[q.k]=q.def;return Object.assign(o,SHIPPED[id]||{});}
+let saved={};
+try{saved=JSON.parse(localStorage.getItem("afl.demo.params.v1")||"{}")||{};}catch(e){saved={};}
+for(const id of Object.keys(ATK))P[id]=Object.assign(defaults(id),saved[id]||{});
+try{const t=localStorage.getItem("afl.demo.tab");if(t&&ATK[t])st.tab=t;}catch(e){}
+function persist(){try{localStorage.setItem("afl.demo.params.v1",JSON.stringify(P));localStorage.setItem("afl.demo.tab",st.tab);}catch(e){}}
+const A=()=>ATK[st.tab], PP=()=>P[st.tab];
+const VX=()=>A().vx??6.25;
+function poses(){const a=A(),p=PP();const o=a.poses(p);o.recoil=a.recoil(p);return o;}
+
+// ---------- schedule ----------
+let S=null;
+function buildSchedule(){
+  const a=A(),p=PP(),five=st.mode==="five";
+  const pad=0.35,hold=p.hold/30,strike=p.strike/30,hang=a.pan?(p.hangfire||0)/1000:0;
+  const s={pad,windStart:pad};
+  if(five){s.coil=pad+p.windup;s.holdEnd=s.coil+hold;s.pan=s.holdEnd+strike;s.release=s.pan+hang;}
+  else{const T=p.windup+hold+strike+hang;s.coil=pad+T/2;s.holdEnd=s.coil;s.pan=pad+T-hang;s.release=pad+T;}
+  s.hsV=five?p.hitstop/1000:0; s.hsA=(a.kind==="melee"&&five)?s.hsV:0;
+  const ps=poses();
+  s.relPose=exag(ps.release,ps.idle,p.exag);
+  const Jr=rig(s.relPose,CASTER_X,1,a.weapon);
+  const vx=VX();
+  s.target=v(vx-0.12,1.02);
+  let launch=Jr.hR;
+  if(a.weapon&&a.weapon.type==="bow")launch=Jr.hL;
+  const wpr=weaponPts(Jr,a.weapon);if(wpr&&(a.weapon.type==="crossbow"||a.weapon.type==="musket"))launch=wpr.tip;
+  s.launch=launch;
+  let travel=0;
+  if(a.proj){s.dist=len(sub(s.target,launch));travel=s.dist/(p.speed*2);}
+  if(st.tab==="ice")travel=ICE_N*p.interval/1000;
+  s.contact=s.release+travel;
+  s.impactEnd=s.contact+s.hsV;
+  if(a.chain)s.hops=[s.contact,s.contact+p.hop/1000,s.contact+2*p.hop/1000];
+  s.shatter=st.tab==="ice"?s.impactEnd+p.shatterHold:null;
+  s.afterStart=st.tab==="ice"?s.shatter:s.impactEnd;
+  const after=Math.max(p.aftermath??0,p.cloud??0,p.crumble??0,(p.drain??0)+0.3,(p.frozen??0)+1.0,0.7)+(boltCount()>1?2*stagger():0);
+  const follow=isWither()?p.channel:(p.follow??0.08), endHold=(p.endHold??0)/30;
+  s.follow=follow;s.endHold=endHold;
+  s.attEnd=s.release+s.hsA+follow+endHold+p.recover;
+  s.reloadStart=a.reload?s.attEnd:null; s.reloadEnd=a.reload?s.release+p.reload:null;
+  if(a.reload&&s.reloadEnd<s.attEnd+0.6)s.reloadEnd=s.attEnd+0.6;
+  s.end=Math.max(s.afterStart+after,s.attEnd,a.reload?s.reloadEnd+0.3:0)+0.35;
+  s.react=five?s.contact:s.contact+0.15;
+  s.fx=five?s.contact:s.contact+0.10;
+  s.snd=five?s.contact:s.contact-0.07;
+  s.ev={damage:s.contact,sound:s.snd,effects:s.fx,reaction:s.react,recoil:five?(a.kind==="melee"?s.impactEnd:s.release):null};
+  const segs=[];const push=(x,y,cls,label)=>{if(y-x>0.0005)segs.push({a:x,b:y,cls,label});};
+  push(0,pad,"idle","");
+  if(five){push(pad,s.coil,"b1",a.kind==="ranged"&&a.weapon?"Draw / aim":"Gather");push(s.coil,s.holdEnd,"hold","Hold");push(s.holdEnd,s.pan,"b2","Launch");if(hang)push(s.pan,s.release,"b2","Pan flash");}
+  else{push(pad,s.release,"b1","Even wind-up and strike");}
+  push(s.release,s.contact,"b3","Travel");
+  push(s.contact,s.impactEnd,"b4","Impact");
+  if(st.tab==="ice")push(s.impactEnd,s.shatter,"b4","Frozen");
+  push(s.afterStart,s.end,"b5",a.reload?"Aftermath + reload":"Aftermath");
+  s.segs=segs;
+  S=s;
+}
+function beatAt(t){
+  if(!S||t<S.pad)return -1;
+  if(st.mode!=="five"){if(t<S.release)return 1;if(t<S.contact)return 3;if(st.tab==="ice"&&t<S.shatter)return 4;return t<S.contact+0.15?4:5;}
+  if(t<S.holdEnd)return 1;if(t<S.release)return 2;if(t<S.contact)return 3;if(t<(S.shatter??S.impactEnd))return 4;return 5;
+}
+
+// ---------- poses over time ----------
+function casterPose(t){
+  const a=A(),p=PP(),ps=poses(),I=ps.idle,C=ps.coil,R=ps.release,K=ps.recoil,RL=a.reloadPose;
+  const gun=!!a.reload;
+  let q;
+  if(st.mode==="five"){
+    if(t<S.windStart)q=I;
+    else if(t<S.coil)q=lerpPose(I,C,eIO((t-S.windStart)/(S.coil-S.windStart)));
+    else if(t<S.holdEnd)q=C;
+    else if(t<S.release){q=gun?C:lerpPose(C,R,eOut((t-S.holdEnd)/Math.max(S.release-S.holdEnd,1e-4)));}
+    else{
+      const tA=S.release+S.hsA;
+      let base=R;
+      if(gun&&t<S.release+0.035)q=lerpPose(C,R,eOut((t-S.release)/0.035));
+      else if(t<tA)q=lerpPose(R,K,0.04*((t-S.release)/Math.max(S.hsA,1e-4)));
+      else if(t<tA+S.follow){const R2=lerpPose(R,K,a.kind==="melee"?0.04:0);q=lerpPose(gun?R:R2,K,eOutQ((t-tA)/S.follow));}
+      else if(t<tA+S.follow+S.endHold)q=K;
+      else if(t<S.attEnd)q=lerpPose(K,I,eBack(clamp((t-tA-S.follow-S.endHold)/p.recover,0,1),1.4));
+      else q=I;
+      void base;
+    }
+  }else{
+    if(t<S.windStart)q=I;
+    else if(t<S.coil)q=lerpPose(I,C,(t-S.windStart)/(S.coil-S.windStart));
+    else if(t<S.release)q=lerpPose(C,R,(t-S.coil)/(S.release-S.coil));
+    else if(t<S.release+p.recover+S.follow)q=lerpPose(R,I,(t-S.release)/(p.recover+S.follow));
+    else q=I;
+  }
+  if(gun&&RL&&t>=S.reloadStart&&t<S.reloadEnd){const u1=clamp((t-S.reloadStart)/0.25,0,1),u2=clamp((S.reloadEnd-t)/0.25,0,1);q=lerpPose(q,RL,eIO(Math.min(u1,u2)));}
+  return exag(q,I,p.exag);
+}
+function victimState(t){
+  const a=A(),p=PP(),five=st.mode==="five";
+  const fl=p.flinch??1;
+  let amp=a.react.amp*fl;let pushD=a.react.push*fl;
+  if(st.tab==="shield"&&p.variant==="Shield bash"){amp*=1.3;pushD*=2;}
+  let r=0,push=0,shake=0,flash=0,frozen=false;
+  const shakeAmp=0.035*(st.view==="god"?2.2:1);
+  if(five){
+    if(t>=S.contact&&t<S.impactEnd){const u=(t-S.contact)/S.hsV;r=amp*eOut(u);shake=shakeAmp*(1-u)*Math.sin((t-S.contact)*2*Math.PI*28);}
+    else if(t>=S.impactEnd){
+      if(st.tab==="ice"&&t<S.shatter){r=amp;frozen=true;}
+      else{const t0=st.tab==="ice"?S.shatter:S.impactEnd;const AA=st.tab==="ice"?14*fl:amp;const tau=t-t0;r=AA*Math.exp(-5*tau)*Math.cos(10*tau);}
+    }
+    if(t>=S.contact){const tau=t-S.contact;push=pushD*(1-Math.exp(-14*tau))*Math.exp(-0.9*Math.max(0,tau-0.4));}
+  }else{
+    if(t>=S.react){const tau=t-S.react;r=amp*Math.exp(-5*tau)*Math.cos(10*tau);push=pushD*Math.exp(-0.9*Math.max(0,tau-0.4));}
+    if(st.tab==="ice"&&t>=S.contact&&t<S.shatter)frozen=true;
+  }
+  if(t>=S.contact&&t<S.contact+0.066)flash=1-(t-S.contact)/0.066;
+  const pose={lean:r,hx:-push+shake,hy:0,head:r*0.7,sR:12+r*2.2,eR:30+r,sL:8+r*1.6,eL:28+r*0.6};
+  if(frozen){pose.sR=12+amp*2;pose.sL=8+amp*1.5;}
+  return {pose,flash,frozen};
+}
+
+// ---------- simulation ----------
+let sim;
+function resetSim(){sim={parts:[],fires:[],crystals:[],trail:[],rng:mulberry(1337),emit:0,smoke:0,snow:0};}
+const R=()=>sim.rng();
+function particle(o){sim.parts.push(Object.assign({vx:0,vy:0,g:0,dr:0,life:1,max:1,size:.05,rot:0,vr:0},o));}
+function crossed(t0,t1,x){return x!=null&&t0<x&&t1>=x;}
+function chips(pt,n,col,dirx=1,sp=2){for(let i=0;i<n;i++){const ang=(R()-.5)*1.8+0.5;const s=sp*(0.5+R());particle({kind:"shard",col,x:pt.x,y:pt.y,vx:Math.cos(ang)*s*dirx,vy:Math.sin(ang)*s,g:-7,dr:0.5,life:.5+R()*.5,max:1,size:.025+R()*.03,rot:R()*6,vr:(R()-.5)*25});}}
+function dust(pt,n,size=.07){for(let i=0;i<n;i++)particle({kind:"dust",x:pt.x+(R()-.5)*0.1,y:pt.y+(R()-.5)*0.1,vx:R()*0.8,vy:(R()-.3)*0.6,dr:2,life:.6+R()*.5,max:1.1,size:size*(0.8+R()*0.6)});}
+function events(t0,t1,J){
+  const a=A(),p=PP();
+  if(crossed(t0,t1,S.pan)&&a.pan){const wp=weaponPts(J,a.weapon);sfx("fizz");sim.panAt=t1;sim.panPt=wp?wp.lock:J.hR;
+    for(let i=0;i<5;i++)particle({kind:"smoke",x:sim.panPt.x,y:sim.panPt.y+0.04,vx:(R()-.5)*0.3,vy:0.4+R()*0.4,dr:1.2,life:.8+R()*.6,max:1.4,size:.04+R()*.03});}
+  if(crossed(t0,t1,S.release)){
+    if(st.tab==="fireball"){sfx("whoosh");sim.launchAt=t1;sim.ring={x:S.launch.x,y:S.launch.y};}
+    if(st.tab==="ice"){sfx("crack");for(let i=0;i<8;i++)particle({kind:"snow",x:J.hR.x+R()*0.2,y:0.05,vx:(R()-.3)*1.2,vy:R()*1.4+0.4,g:-3,dr:1.5,life:.6,max:.6,size:.03});}
+    if(st.tab==="bow"){sfx("twang");sim.stringAt=t1;}
+    if(st.tab==="crossbow"){sfx("clack");sim.stringAt=t1;dust(S.launch,2,.04);}
+    if(st.tab==="musket"){sfx("boom");sim.launchAt=t1;const m=S.launch;
+      for(let i=0;i<24;i++){particle({kind:"smoke",x:m.x,y:m.y,vx:1.2+R()*2.6,vy:(R()-.4)*0.8,dr:2.6,life:PP().aftermath*(0.55+R()*0.45),max:PP().aftermath,size:.08+R()*.1,grow:2.6});}
+      for(let i=0;i<10;i++){const an=(R()-.5)*0.5;particle({kind:"ember",x:m.x,y:m.y,vx:Math.cos(an)*4,vy:Math.sin(an)*4,g:-3,dr:3,life:.15+R()*.2,max:.35,size:.012});}}
+    if(a.kind==="melee")sfx("whoosh2");
+  }
+  if(crossed(t0,t1,S.snd))sfx({fireball:"thump",ice:"ping",sword:"clang",greatsword:"clang",spear:"thud",shield:p.variant==="Shield bash"?"wood":"clang",bow:"thunk",crossbow:"thunk",musket:"thud"}[st.tab]);
+  if(crossed(t0,t1,S.fx))impactFx(t1);
+  if(SC()&&crossed(t0,t1,S.snd))sfx({blood:"splat",plague:"splat",bone:"thunk",frost:"shatter",arcane:"pop",storm:"zap",holy:isWither()?null:"boom"}[schoolOf()]);
+  schoolEvents(t0,t1,J);
+  if(st.tab==="ice"){
+    const x0=CASTER_X+0.5,x1=VX()-0.5;
+    for(let i=0;i<ICE_N;i++){const ti=S.release+i*p.interval/1000;
+      if(crossed(t0,t1,ti)){const u=(i+1)/(ICE_N+1);const x=lerp(x0,x1,u)+(R()-.5)*0.08;
+        sim.crystals.push({x,born:ti,h:0.22+u*0.38,w:0.12+u*0.08,lean:(R()-.5)*18,cluster:false});
+        if(i%2===0)sfx("tick");
+        for(let k=0;k<3;k++)particle({kind:"snow",x,y:0.03,vx:(R()-.5)*0.8,vy:R()*1+0.3,g:-3,dr:1.5,life:.5,max:.5,size:.025});}}
+    if(crossed(t0,t1,S.shatter)){sfx("shatter");shatter(t1);}
+  }
+}
+function contactPoint(){
+  const a=A();
+  if(a.kind!=="melee")return S.target;
+  const J=rig(S.relPose,CASTER_X,1,a.weapon);const w=weaponPts(J,a.weapon);
+  let y=w?clamp(w.tip.y,0.45,1.35):1;
+  if(st.tab==="shield"&&PP().variant==="Shield bash")y=J.hL.y;
+  return v(VX()-0.2,y);
+}
+function impactFx(t){
+  const a=A(),tg=S.target,vx=VX();sim.impact=t;
+  if(SC()){schoolImpact(t,0);return;}
+  if(st.tab==="fireball"){
+    for(let i=0;i<34;i++){const an=R()*Math.PI*2,sp=1.2+R()*3.2;particle({kind:"ember",x:tg.x,y:tg.y,vx:Math.cos(an)*sp*0.8+0.6,vy:Math.sin(an)*sp+0.8,g:-4.5,dr:1.6,life:.5+R()*.7,max:1.2,size:.025+R()*.02});}
+    for(let i=0;i<10;i++){particle({kind:"smoke",x:tg.x+(R()-.5)*0.3,y:tg.y+(R()-.5)*0.2,vx:(R()-.5)*0.4+0.2,vy:0.3+R()*0.4,dr:0.8,life:1.4+R()*0.8,max:2.2,size:.14+R()*.1});}
+    for(let i=0;i<3;i++)sim.fires.push({x:vx+(i-1)*0.35+(R()-.5)*0.15,born:t,life:P.fireball.aftermath*(0.55+R()*0.45),seed:R()*10,h:0.12+R()*0.08});
+  }
+  if(st.tab==="ice"){
+    const xs=[-0.32,-0.12,0.1,0.3,-0.22,0.2];
+    xs.forEach((dx,i)=>sim.crystals.push({x:vx+dx,born:t,h:0.55+(i<4?0.35:0.15)+R()*0.15,w:0.22,lean:dx*55+(R()-.5)*10,cluster:true}));
+    for(let i=0;i<10;i++)particle({kind:"mist",x:vx+(R()-.5)*0.6,y:0.2+R()*0.4,vx:(R()-.5)*0.5,vy:0.1+R()*0.2,dr:1,life:1+R()*0.5,max:1.5,size:.12+R()*.1});
+  }
+  if(a.kind==="melee"){
+    const cp=contactPoint();
+    const bash=st.tab==="shield"&&PP().variant==="Shield bash";
+    if(bash){dust(cp,8,.09);chips(cp,6,"150,110,70",1,2.2);}
+    else if(st.tab==="spear"){chips(cp,8,"226,219,198",1,2.4);dust(cp,4);}
+    else{const n=st.tab==="greatsword"?30:22;for(let i=0;i<n;i++){const an=(R()-.5)*1.6+0.35,sp=2.5+R()*3.5;particle({kind:"spark",x:cp.x,y:cp.y,vx:Math.cos(an)*sp,vy:Math.sin(an)*sp+0.5,g:-7,dr:1.2,life:.18+R()*.25,max:.43,size:.012});}
+      chips(cp,st.tab==="greatsword"?6:3,"226,219,198",1,2);dust(cp,5);}
+  }
+  if(st.tab==="bow"||st.tab==="crossbow"){chips(tg,st.tab==="bow"?4:8,"226,219,198",1,1.6);dust(tg,st.tab==="bow"?2:4,.05);
+    const tb=projState(S.contact-0.001);sim.stuck={dir:tb?tb.dir:v(1,0)};}
+  if(st.tab==="musket"){chips(tg,8,"226,219,198",1,2.6);dust(tg,8,.08);}
+}
+function shatter(t){
+  for(const c of sim.crystals){
+    const n=c.cluster?7:4;
+    for(let i=0;i<n;i++){const an=(R()*0.9+0.05)*Math.PI;const sp=1+R()*2.6;
+      particle({kind:"shard",col:"200,236,255",x:c.x+(R()-.5)*c.w,y:c.h*R()*0.9,vx:Math.cos(an)*sp,vy:Math.sin(an)*sp,g:-7,dr:0.4,life:.6+R()*.6,max:1.2,size:.04+R()*.05,rot:R()*6,vr:(R()-.5)*20});}
+    for(let i=0;i<2;i++)particle({kind:"mist",x:c.x,y:c.h*0.4,vx:(R()-.5)*0.6,vy:0.15+R()*0.2,dr:1,life:.8+R()*.6,max:1.4,size:.07+R()*.06});
+    c.dead=t;
+  }
+  sim.melt=t;
+}
+function projState(t,k=0){
+  const a=A();if(!a.proj)return null;
+  const off=k*stagger();const r0=S.release+off,c0=S.contact+off;
+  if(t<r0||t>=c0)return null;
+  const u=clamp((t-r0)/Math.max(c0-r0,1e-4),0,1);
+  const uu=st.mode==="five"?u:eOutQ(u);
+  const pp=PP();
+  const arc=a.proj.type==="ball"?0.12:(pp.arc!=null?pp.arc*2:(a.proj.type==="bolt"?0.06:0));
+  const n=boltCount();const L0=add(S.launch,v(0,n>1?(k-1)*0.07:0)),T0=add(S.target,v(0,n>1?(k-1)*0.12:0));
+  const at=x=>{let q;if(pp.curve){const mid=lerpV(L0,T0,0.5);q=bezier(L0,add(mid,v(-0.5,pp.curve*1.4)),T0,x);}else q=lerpV(L0,T0,x);q.y+=4*arc*x*(1-x);return q;};
+  const pos=at(uu),p2=at(Math.min(1,uu+0.01));
+  return {pos,dir:norm(sub(p2,pos)),u};
+}
+function stepSim(dt,silent){
+  const a=A(),t0=st.t,t1=st.t+dt;
+  const J=rig(casterPose(t1),CASTER_X,1,a.weapon);
+  sim.J=J;
+  const was=sfxMute;sfxMute=silent||!st.sound;
+  events(t0,t1,J);
+  sfxMute=was;
+  st.t=t1;
+  if(st.tab==="fireball"&&t1>S.windStart&&t1<S.release){
+    sim.emit+=dt*70;
+    while(sim.emit>=1){sim.emit--;particle({kind:"spiral",ang:R()*Math.PI*2,r:0.35+R()*0.35,w:(5+R()*4)*(R()<.5?1:-1),rv:0.9+R()*0.6,life:1,max:1,size:.018+R()*.016});}
+  }
+  const ps=projState(t1);
+  if(ps&&(st.tab==="fireball"||st.tab==="musket")){
+    sim.smoke+=dt*(st.tab==="musket"?120:50);
+    while(sim.smoke>=1){sim.smoke--;
+      particle({kind:"smoke",x:ps.pos.x,y:ps.pos.y,vx:(R()-.5)*0.2,vy:0.15+R()*0.2,dr:1.5,life:st.tab==="musket"?.4:.5+R()*.3,max:.8,size:st.tab==="musket"?.025:.06+R()*.04});
+      if(st.tab==="fireball"&&R()<.6)particle({kind:"ember",x:ps.pos.x,y:ps.pos.y,vx:(R()-.5)*0.8,vy:(R()-.2)*0.8,g:-3,dr:1.5,life:.35+R()*.35,max:.7,size:.014+R()*.012});}
+  }
+  if(st.tab==="fireball"){for(const f of sim.fires){const age=t1-f.born;if(age<f.life&&R()<dt*6)particle({kind:"smoke",x:f.x,y:f.h,vx:(R()-.5)*0.1,vy:0.35,dr:0.4,life:1.2,max:1.2,size:.06});}}
+  if(st.tab==="ice"&&t1>S.windStart&&t1<S.release){sim.snow+=dt*18;while(sim.snow>=1){sim.snow--;const an=R()*Math.PI*2;particle({kind:"snow",x:J.hR.x+Math.cos(an)*0.12,y:J.hR.y+Math.sin(an)*0.12,vx:(R()-.5)*0.2,vy:-0.1-R()*0.2,dr:1,life:.6,max:.6,size:.016});}}
+  if(a.kind==="melee"&&st.mode==="five"&&a.weapon&&(p_trail()>0)){
+    const on=t1>=S.holdEnd-0.01&&t1<=S.impactEnd+S.follow+0.02;
+    const frozen=t1>S.release&&t1<S.impactEnd;
+    const w=weaponPts(J,a.weapon);
+    if(on&&!frozen&&w)sim.trail.push({h:lerpV(J.hR,w.tip,a.weapon.type==="spear"?0.85:0.6),t:w.tip,time:t1});
+    if(!frozen){const keep=p_trail()/30;sim.trail=sim.trail.filter(e=>t1-e.time<=keep&&(on||t1-e.time<keep*0.6));}
+  }
+  schoolStep(dt,t1,J);
+  for(const q of sim.parts){
+    q.life-=dt;
+    if(q.kind==="spiral"){q.ang+=q.w*dt;if(q.jit)q.ang+=(R()-.5)*q.jit*20;q.r-=q.rv*dt*(0.6+0.8*(1-q.r));if(q.r<0.04)q.life=0;continue;}
+    if(q.kind==="seek"){q.age+=dt;const u=clamp(q.age/q.dur,0,1);const tg=sim.J.hR;const e=u*u;q.x=lerp(q.x0,tg.x,e)+Math.sin(u*9+q.x0*10)*q.wig*(1-u);q.y=lerp(q.y0,tg.y,e)+Math.cos(u*7+q.x0)*q.wig*(1-u);continue;}
+    q.vy+=q.g*dt;const k=Math.max(0,1-q.dr*dt);q.vx*=k;q.vy*=k;q.x+=q.vx*dt;q.y+=q.vy*dt;q.rot+=q.vr*dt;
+    if(q.kind==="smoke"&&q.grow){q.vy+=0.06*dt;}
+    if(q.kind==="shard"&&q.y<0.01){q.y=0.01;q.vy*=-0.25;q.vx*=0.5;q.vr*=0.5;}
+    if((q.kind==="ember"||q.kind==="spark")&&q.y<0.005){q.y=0.005;q.vy*=-0.3;q.vx*=0.6;}
+    if(q.kind==="drop"&&q.y<0.01){q.life=0;if(st.tab==="blood")(sim.splats=sim.splats||[]).push({x:q.x,r:0.03+q.size*1.6,t:st.t});}
+  }
+  sim.parts=sim.parts.filter(q=>q.life>0);
+}
+const p_trail=()=>PP().trail??0;
+function simulateTo(t){resetSim();st.t=0;const h=1/120;while(st.t+h<t)stepSim(h,true);stepSim(Math.max(0,t-st.t),true);}
+
+// ---------- schools: the casters' other spells (SpellSchool in the game) ----------
+const SCH={
+  blood:{core:"255,117,102",edge:"168,5,13",glow:"255,50,40",eye:"#ff5a4a"},
+  plague:{core:"209,255,115",edge:"87,184,20",glow:"150,230,60",eye:"#b6f25a"},
+  bone:{core:"255,250,230",edge:"194,184,158",glow:"240,230,200",eye:"#f2ead2"},
+  frost:{core:"219,247,255",edge:"77,184,255",glow:"120,200,255",eye:"#9fe0ff"},
+  arcane:{core:"219,184,255",edge:"117,51,255",glow:"160,110,255",eye:"#c7a8ff"},
+  holy:{core:"255,250,209",edge:"255,204,77",glow:"255,230,150",eye:"#ffe9a8"},
+  storm:{core:"255,255,255",edge:"150,90,255",glow:"190,150,255",eye:"#d9c7ff"}
+};
+const schoolOf=()=>{const a=A();if(!a.school)return null;return typeof a.school==="function"?a.school(PP()):a.school;};
+const SC=()=>SCH[schoolOf()]||null;
+function styleOf(){const a=A();return typeof a.style==="function"?a.style(PP()):a.style;}
+function victimStyleOf(){const a=A();const s=typeof a.victim==="function"?a.victim(PP()):a.victim;return s||"bone";}
+const isWither=()=>st.tab==="smite"&&PP().variant==="Wither (dead)";
+const boltCount=()=>{const a=A();return a.bolt&&a.bolt.count?a.bolt.count:1;};
+const stagger=()=>(PP().stagger||0)/1000;
+function chainPts(){const vx=VX();return [v(vx,0),v(vx+1.15,0),v(vx+2.3,0)];}
+function chainVictim(t,hitT,scale){
+  const p=PP(),five=st.mode==="five";const hs=five?p.hitstop/1000*scale:0;const amp=(A().react.amp*(p.flinch??1))*scale;
+  let r=0,shake=0,flash=0;const start=five?hitT:hitT+0.15;
+  if(five&&t>=hitT&&t<hitT+hs){const u=(t-hitT)/hs;r=amp*eOut(u);shake=0.035*(1-u)*Math.sin((t-hitT)*2*Math.PI*28);}
+  else if(t>=start+(five?hs:0)){const tau=t-start-(five?hs:0);r=amp*Math.exp(-5*tau)*Math.cos(10*tau);}
+  if(t>=hitT&&t<hitT+0.066)flash=1-(t-hitT)/0.066;
+  return {pose:{lean:r,hx:shake,hy:0,head:r*0.7,sR:12+r*2.2,eR:30+r,sL:8+r*1.6,eL:28+r*0.6},flash};
+}
+function bezier(a,b,c,u){return v((1-u)*(1-u)*a.x+2*(1-u)*u*b.x+u*u*c.x,(1-u)*(1-u)*a.y+2*(1-u)*u*b.y+u*u*c.y);}
+function jag(c,a,b,seed,amp,n,col,w){const r=mulberry(seed);const d=sub(b,a),L=len(d);const pp=v(-d.y/L,d.x/L);c.strokeStyle=col;c.lineWidth=w;c.lineCap="round";c.lineJoin="round";c.beginPath();c.moveTo(a.x,a.y);for(let i=1;i<n;i++){const u=i/n;const o=(r()-.5)*2*amp*Math.sin(Math.PI*u);const q=add(lerpV(a,b,u),mul(pp,o));c.lineTo(q.x,q.y);}c.lineTo(b.x,b.y);c.stroke();}
+function seekP(o){particle(Object.assign({kind:"seek",age:0,life:o.dur,max:o.dur},o));}
+function schoolEvents(t0,t1,J){
+  const a=A(),p=PP(),sc=SC();if(!sc&&!a.chain)return;
+  if(crossed(t0,t1,S.release)){
+    sim.launchAt=t1;
+    sfx({blood:"slosh",plague:"slosh",bone:"rattle",frost:"crack",arcane:"chime",storm:"zap",holy:"chime"}[schoolOf()]);
+    if(isWither())sfx("drain");
+  }
+  for(let k=1;k<boltCount();k++)if(crossed(t0,t1,S.contact+k*stagger())){schoolImpact(t1,k);sfx("thunk");}
+  if(a.chain&&S.hops)for(let k=1;k<S.hops.length;k++)if(crossed(t0,t1,S.hops[k])){schoolImpact(t1,k);sfx("zap");}
+  if(a.bolt&&a.bolt.impact==="freeze"&&crossed(t0,t1,S.impactEnd+p.frozen)){sfx("shatter");shatter(t1);}
+}
+function schoolImpact(t,k){
+  const a=A(),p=PP(),sc=SC();if(!sc)return;
+  let tg=S.target;
+  if(a.chain)tg=add(chainPts()[k],v(-0.1,1.0));
+  if(a.bolt&&boltCount()>1)tg=add(tg,v(0,(k-1)*0.12));
+  const b=a.bolt?a.bolt.impact:null;
+  if(b==="splash"){for(let i=0;i<20;i++){const an=(R()*0.9+0.05)*Math.PI*(R()<.75?1:-1);const sp=1+R()*2.6;particle({kind:"drop",rgb:sc.edge,x:tg.x,y:tg.y,vx:Math.cos(an)*sp+0.4,vy:Math.abs(Math.sin(an))*sp*(R()<.3?-1:1),g:-7,dr:0.6,life:1.4,max:1.4,size:.018+R()*.022});}
+    for(let i=0;i<5;i++)particle({kind:"smoke",rgb:sc.edge,x:tg.x,y:tg.y,vx:(R()-.3)*0.5,vy:(R()-.5)*0.3,dr:2.5,life:.5,max:.5,size:.07});}
+  if(b==="cloud"){sim.cloudAt=t;for(let i=0;i<26;i++)particle({kind:"smoke",rgb:"120,160,50",x:tg.x+(R()-.5)*0.4,y:0.25+R()*0.9,vx:(R()-.5)*0.6,vy:(R()-.4)*0.15,dr:1.6,life:p.cloud*(0.6+R()*0.4),max:p.cloud,size:.1+R()*.1,grow:1.3});
+    for(let i=0;i<8;i++)particle({kind:"drop",rgb:sc.edge,x:tg.x,y:tg.y,vx:(R()-.5)*2,vy:R()*1.5,g:-7,dr:.5,life:1,max:1,size:.02});}
+  if(b==="stick"){sim.stuckList=sim.stuckList||[];const ps=projState(t-0.004,k);sim.stuckList.push({k,dir:ps?ps.dir:v(1,0),off:(k-1)*0.1,at:t});chips(tg,4,sc.core,1,1.6);}
+  if(b==="freeze"){chips(tg,10,sc.core,1,2);const vx=VX();[-0.18,-0.04,0.12,0.24].forEach((dx,i)=>sim.crystals.push({x:vx+dx,born:t,h:0.32+(i%2)*0.14+R()*0.08,w:0.15,lean:dx*60,cluster:true}));
+    for(let i=0;i<6;i++)particle({kind:"mist",x:tg.x,y:tg.y-0.3,vx:(R()-.5)*0.5,vy:0.1+R()*0.2,dr:1,life:1,max:1,size:.1});}
+  if(b==="burst"){for(let i=0;i<14;i++){const an=R()*Math.PI*2,sp=0.8+R()*1.6;particle({kind:"ember",rgb:sc.core,x:tg.x,y:tg.y,vx:Math.cos(an)*sp,vy:Math.sin(an)*sp,g:-1,dr:3,life:.3+R()*.3,max:.6,size:.014});}}
+  if(a.chain){for(let i=0;i<12;i++){const an=(R()-.5)*2.4+0.2,sp=2+R()*3;particle({kind:"spark",rgb:"220,200,255",x:tg.x,y:tg.y,vx:Math.cos(an)*sp,vy:Math.sin(an)*sp,g:-6,dr:1.5,life:.15+R()*.2,max:.35,size:.01});}
+    for(let i=0;i<3;i++)particle({kind:"smoke",x:tg.x,y:tg.y,vx:(R()-.5)*0.2,vy:0.3,dr:1,life:p.aftermath,max:p.aftermath,size:.06});}
+  if(st.tab==="smite"&&!isWither()){const vx=VX();for(let i=0;i<12;i++){const an=(R()<.5?0:Math.PI)+(R()-.5)*0.6;particle({kind:"dust",x:vx,y:0.05,vx:Math.cos(an)*(1+R()*1.5),vy:R()*0.3,dr:2.2,life:.8+R()*.5,max:1.3,size:.07});}
+    for(let i=0;i<14;i++)particle({kind:"ember",rgb:sc.core,x:vx+(R()-.5)*0.3,y:0.1+R()*0.8,vx:(R()-.5)*0.2,vy:0.4+R()*0.6,g:0.3,dr:1,life:p.aftermath*(0.5+R()*0.5),max:p.aftermath,size:.014});}
+}
+function schoolStep(dt,t1,J){
+  const a=A(),p=PP(),sc=SC();if(!sc)return;
+  const gathering=t1>S.windStart&&t1<S.release;
+  const g=a.bolt?a.bolt.gather:(a.chain?"crackle":(isWither()?"dark":"holy"));
+  if(gathering){
+    sim.emit+=dt*({drops:40,flies:55,chips:22,frost:40,ring:0,crackle:0,dark:40,holy:25}[g]||0);
+    while(sim.emit>=1){sim.emit--;
+      if(g==="drops"){const x0=CASTER_X+(R()-.3)*1.1;seekP({rgb:sc.edge,x0,y0:0.01,x:x0,y:0.01,dur:.35+R()*.3,size:.018+R()*.014,wig:0.05});}
+      else if(g==="chips"){const x0=CASTER_X+(R()-.3)*1.2;seekP({rgb:sc.core,x0,y0:0.01,x:x0,y:0.01,dur:.4+R()*.3,size:.03,shard:true,wig:0.03});}
+      else if(g==="flies"){particle({kind:"spiral",rgb:R()<.5?sc.core:"30,30,24",ang:R()*Math.PI*2,r:0.25+R()*0.35,w:(7+R()*6)*(R()<.5?1:-1),rv:0.5+R()*0.4,jit:0.04,life:1,max:1,size:.012+R()*.01});}
+      else if(g==="frost"||g==="dark"){particle({kind:"spiral",rgb:g==="dark"?"120,30,50":sc.core,ang:R()*Math.PI*2,r:0.3+R()*0.3,w:(4+R()*3)*(R()<.5?1:-1),rv:0.8+R()*0.5,life:1,max:1,size:.014+R()*.012});}
+      else if(g==="holy"){particle({kind:"ember",rgb:sc.core,x:J.hR.x+(R()-.5)*0.3,y:J.hR.y-0.2+R()*0.2,vx:(R()-.5)*0.1,vy:0.5+R()*0.4,g:0,dr:1,life:.7,max:.7,size:.012});}
+    }
+  }
+  for(let k=0;k<boltCount();k++){const ps=projState(t1,k);if(!ps)continue;
+    sim.smoke+=dt*30;
+    while(sim.smoke>=1){sim.smoke--;
+      const sh=a.bolt.shape;
+      if(sh==="blood"&&R()<.7)particle({kind:"drop",rgb:sc.edge,x:ps.pos.x,y:ps.pos.y,vx:ps.dir.x*0.6,vy:-0.2,g:-7,dr:.5,life:1.2,max:1.2,size:.014+R()*.01});
+      if(sh==="glob"){particle({kind:"smoke",rgb:"110,150,45",x:ps.pos.x,y:ps.pos.y,vx:(R()-.5)*0.2,vy:0.05,dr:1.5,life:.6,max:.6,size:.05});if(R()<.3)particle({kind:"drop",rgb:sc.edge,x:ps.pos.x,y:ps.pos.y,vx:0,vy:-0.1,g:-7,dr:.5,life:1,max:1,size:.014});}
+      if(sh==="crystal")particle({kind:"snow",x:ps.pos.x,y:ps.pos.y,vx:(R()-.5)*0.3,vy:(R()-.5)*0.3,dr:2,life:.5,max:.5,size:.014});
+      if(sh==="shard"&&R()<.3)particle({kind:"dust",x:ps.pos.x,y:ps.pos.y,vx:0,vy:0,dr:2,life:.3,max:.3,size:.025});
+    }
+  }
+  if(a.bolt&&a.bolt.after==="drain"&&t1>=S.impactEnd&&t1<S.impactEnd+p.drain){
+    sim.snow+=dt*45;const VJ=rig(victimState(t1).pose,VX(),-1);const ch=lerpV(VJ.hip,VJ.sh,0.6);
+    while(sim.snow>=1){sim.snow--;seekP({rgb:sc.edge,x0:ch.x+(R()-.5)*0.1,y0:ch.y+(R()-.5)*0.15,x:ch.x,y:ch.y,dur:.35+R()*.15,size:.02+R()*.012,wig:0.12});}}
+  if(isWither()&&t1>=S.release&&t1<S.release+p.channel){
+    sim.snow+=dt*55;const VJ=rig(victimState(t1).pose,VX(),-1);const ch=lerpV(VJ.hip,VJ.sh,0.6);
+    while(sim.snow>=1){sim.snow--;seekP({rgb:"170,40,70",x0:ch.x,y0:ch.y,x:ch.x,y:ch.y,dur:.3+R()*.15,size:.018,wig:0.08});}}
+}
+function schoolVictim(t,vs){
+  const a=A(),p=PP();
+  if(a.bolt&&a.bolt.impact==="freeze"&&st.mode==="five"&&t>=S.impactEnd&&t<S.impactEnd+p.frozen){vs.frozen=true;}
+  if(a.bolt&&a.bolt.impact==="cloud"&&sim.cloudAt!=null&&t-sim.cloudAt<p.cloud){vs.tint="#9cc25a";vs.pose.lean-=6*Math.sin((t-sim.cloudAt)*7)*0.5+4;vs.pose.head-=8;}
+  if(isWither()&&t>=S.release&&t<S.release+p.channel){const u=clamp((t-S.release)/0.2,0,1);vs.pose.lean=-12*u;vs.pose.head=-14*u;vs.pose.sR=60;vs.pose.sL=50;vs.tint="#8a5468";}
+  return vs;
+}
+function drawSchoolOrb(c,pos,r,sc,shape,t,ang,sx,sy){
+  c.globalCompositeOperation="lighter";glow(c,pos.x,pos.y,r*4,sc.glow,0.35);c.globalCompositeOperation="source-over";
+  c.save();c.translate(pos.x,pos.y);c.rotate(ang||0);
+  if(shape==="blood"){const w=1+0.18*Math.sin(t*26)*(PP().wobble??0.5);const g=c.createRadialGradient(r*0.3,r*0.3,0,0,0,r*1.1);g.addColorStop(0,`rgba(${sc.core},1)`);g.addColorStop(0.5,`rgba(${sc.edge},1)`);g.addColorStop(1,"rgba(60,0,4,1)");c.fillStyle=g;c.beginPath();c.ellipse(0,0,r*(sx||1)*w,r*(sy||1)/w,0,0,Math.PI*2);c.fill();
+    c.fillStyle="rgba(255,220,210,.7)";c.beginPath();c.arc(r*0.35,r*0.35,r*0.18,0,Math.PI*2);c.fill();}
+  else if(shape==="glob"){for(let i=0;i<4;i++){const o=v(Math.cos(t*9+i*1.7)*r*0.35,Math.sin(t*11+i*2.1)*r*0.3);c.fillStyle=i%2?`rgba(${sc.edge},.95)`:"rgba(70,100,25,.95)";c.beginPath();c.arc(o.x,o.y,r*(0.6+0.15*i%2),0,Math.PI*2);c.fill();}
+    c.fillStyle=`rgba(${sc.core},.8)`;c.beginPath();c.arc(-r*0.2,r*0.25,r*0.22,0,Math.PI*2);c.fill();}
+  else if(shape==="crystal"){c.rotate(t*6);const n=7;c.beginPath();for(let i=0;i<n*2;i++){const rr=i%2?r*0.45:r*1.15;const an=i/(n*2)*Math.PI*2;c.lineTo(Math.cos(an)*rr,Math.sin(an)*rr);}c.closePath();c.fillStyle=`rgba(${sc.core},.95)`;c.fill();c.strokeStyle=`rgba(${sc.edge},1)`;c.lineWidth=r*0.12;c.stroke();}
+  else if(shape==="mote"){const g=c.createRadialGradient(0,0,0,0,0,r);g.addColorStop(0,"#fff");g.addColorStop(0.4,`rgba(${sc.core},1)`);g.addColorStop(1,`rgba(${sc.edge},0)`);c.fillStyle=g;c.beginPath();c.ellipse(0,0,r*(sx||1),r*(sy||1),0,0,Math.PI*2);c.fill();}
+  else if(shape==="shard"){c.fillStyle=`rgba(${sc.core},1)`;c.strokeStyle=`rgba(${sc.edge},1)`;c.lineWidth=0.012;c.beginPath();c.moveTo(r*1.6,0);c.lineTo(-r*0.6,r*0.32);c.lineTo(-r*1.1,0);c.lineTo(-r*0.6,-r*0.32);c.closePath();c.fill();c.stroke();}
+  c.restore();
+}
+function schoolDrawBack(c,t,J){
+  const a=A(),p=PP(),sc=SC();if(!sc)return;const vx=VX();
+  if(sim.splats)for(const s of sim.splats){const al=clamp(0.75-(t-s.t)/6,0,0.75);c.fillStyle=`rgba(90,8,10,${al})`;c.beginPath();c.ellipse(s.x,0.004,s.r,s.r*0.22,0,0,Math.PI*2);c.fill();}
+  if(a.bolt&&a.bolt.impact==="cloud"&&sim.cloudAt!=null){const al=clamp(0.45-(t-sim.cloudAt)/(p.cloud*2),0,0.45);c.fillStyle=`rgba(70,95,25,${al})`;c.beginPath();c.ellipse(vx,0.004,0.75,0.06,0,0,Math.PI*2);c.fill();}
+  if(st.tab==="smite"&&!isWither()&&t>S.windStart&&t<S.release+0.05){const u=clamp((t-S.windStart)/(S.holdEnd-S.windStart),0,1);const rr=lerp(0.75,0.22,eIO(u));
+    c.strokeStyle=`rgba(${sc.edge},${0.25+0.6*u})`;c.lineWidth=0.025;c.beginPath();c.ellipse(vx,0.01,rr,rr*0.18,0,0,Math.PI*2);c.stroke();
+    c.globalCompositeOperation="lighter";glow(c,vx,0.02,rr*1.2,sc.glow,0.15*u);c.globalCompositeOperation="source-over";}
+  if(st.tab==="smite"&&!isWither()&&sim.impact!=null){const al=clamp(0.5-(t-sim.impact)/4,0,0.5);c.fillStyle=`rgba(30,26,18,${al})`;c.beginPath();c.ellipse(vx,0.004,0.35,0.04,0,0,Math.PI*2);c.fill();}
+}
+function drawChainVictims(c,t){
+  if(!A().chain||!S.hops)return;const pts=chainPts();
+  for(let k=1;k<3;k++){const sc=Math.pow(1-PP().falloff/100,k);const vs=chainVictim(t,S.hops[k],sc);drawActor(c,rig(vs.pose,pts[k].x,-1),"bone",{flash:vs.flash});}
+}
+function schoolDrawFront(c,t,J){
+  const a=A(),p=PP(),sc=SC();if(!sc)return;
+  // gather in the hand
+  if(t>S.windStart&&t<S.release){const u=clamp((t-S.windStart)/(S.coil-S.windStart),0,1);
+    if(a.bolt&&a.bolt.shape!=="shard"){const r=(0.03+0.11*eIn(u))*(a.bolt.shape==="mote"?0.6:1);drawSchoolOrb(c,J.hR,r,sc,a.bolt.shape,t,0);}
+    if(a.bolt&&a.bolt.gather==="ring"){c.globalCompositeOperation="lighter";for(let i=0;i<5;i++){const an=t*7+i*Math.PI*2/5;const q=add(J.hR,v(Math.cos(an)*0.13,Math.sin(an)*0.09));glow(c,q.x,q.y,0.04,sc.glow,0.9*u);}c.globalCompositeOperation="source-over";}
+    if(a.bolt&&a.bolt.shape==="shard"&&t>S.coil-0.1){for(let k=0;k<3;k++){const pos=add(J.hR,v(0.06+k*0.02,(k-1)*0.09));drawSchoolOrb(c,pos,0.07,sc,"shard",t,(k-1)*0.25);}}
+    if(a.chain){c.globalCompositeOperation="lighter";const sd=Math.floor(t*30);for(const h of [J.hR,J.hL]){for(let i=0;i<3;i++){const r=mulberry(sd*7+i);const e=add(h,v((r()-.5)*0.35*u,(r()-.5)*0.35*u));jag(c,h,e,sd*13+i,0.03,5,`rgba(${sc.core},${0.8*u})`,0.012);}glow(c,h.x,h.y,0.25,sc.glow,0.4*u);}c.globalCompositeOperation="source-over";}
+    if(st.tab==="smite"){c.globalCompositeOperation="lighter";glow(c,J.hR.x,J.hR.y,0.3,isWither()?"170,40,70":sc.glow,0.45*u);glow(c,J.hL.x,J.hL.y,0.25,isWither()?"170,40,70":sc.glow,0.35*u);c.globalCompositeOperation="source-over";}
+  }
+  // projectiles in flight
+  if(a.bolt){for(let k=0;k<boltCount();k++){const ps=projState(t,k);if(!ps)continue;const ang=Math.atan2(ps.dir.y,ps.dir.x);
+    if(a.bolt.shape==="mote"){c.globalCompositeOperation="lighter";let prev=null;for(let i=0;i<14;i++){const q=projState(Math.max(S.release+k*stagger()+1e-4,t-i*0.014),k);if(!q)break;if(prev)seg(c,prev,q.pos,0.03*(1-i/14),`rgba(${sc.glow},${0.6*(1-i/14)})`);prev=q.pos;}c.globalCompositeOperation="source-over";}
+    const sp=(S.dist||4)/Math.max(S.contact-S.release,1e-3);const sx=1+(p.stretch??0.4)*clamp(sp/6,0,2),sy=1/Math.sqrt(sx);
+    drawSchoolOrb(c,ps.pos,a.bolt.shape==="shard"?0.07:a.bolt.shape==="mote"?0.06:0.14,sc,a.bolt.shape,t,a.bolt.shape==="crystal"?0:ang,sx,sy);}}
+  // frost crystals
+  if(a.bolt&&a.bolt.impact==="freeze"){for(const cr of sim.crystals){if(cr.dead!=null)continue;const u=clamp((t-cr.born)/(5/30),0,1);crystalPath(c,cr,u<1?eBack(u,1.4):1);}}
+  // stuck bone shards
+  if(sim.stuckList){const VJ=rig(victimState(t).pose,VX(),-1);for(const s of sim.stuckList){const age=t-s.at;if(age>p.crumble)continue;const ch=add(lerpV(VJ.hip,VJ.sh,0.55),v(0,s.off));drawSchoolOrb(c,add(ch,mul(s.dir,-0.04)),0.07*(age>p.crumble-0.25?clamp((p.crumble-age)/0.25,0,1):1),sc,"shard",t,Math.atan2(s.dir.y,s.dir.x));
+    if(Math.abs(age-p.crumble+0.12)<0.01)dust(ch,3,.04);}}
+  // chain bolts
+  if(a.chain&&S.hops){const pts=chainPts();const ends=[J.hR,add(pts[0],v(-0.1,1)),add(pts[1],v(-0.1,1)),add(pts[2],v(-0.1,1))];
+    c.globalCompositeOperation="lighter";
+    for(let k=0;k<3;k++){const t0=S.hops[k];const age=t-t0;if(age<0||age>0.16)continue;const al=1-age/0.16;const w=Math.pow(1-p.falloff/100,k);const sd=k*97+Math.floor(t*33);
+      jag(c,ends[k],ends[k+1],sd,0.18,12,`rgba(${sc.edge},${0.6*al})`,0.07*w);jag(c,ends[k],ends[k+1],sd,0.18,12,`rgba(255,255,255,${al})`,0.025*w);glow(c,ends[k+1].x,ends[k+1].y,0.6*w,sc.glow,0.8*al);}
+    c.globalCompositeOperation="source-over";}
+  // smite
+  if(st.tab==="smite"){const vx=VX();
+    if(!isWither()&&t>=S.release&&t<S.release+0.18){const al=1-(t-S.release)/0.18;c.globalCompositeOperation="lighter";const w=0.22*al+0.04;const g=c.createLinearGradient(vx-w,0,vx+w,0);g.addColorStop(0,`rgba(${sc.edge},0)`);g.addColorStop(0.5,`rgba(${sc.core},${al})`);g.addColorStop(1,`rgba(${sc.edge},0)`);c.fillStyle=g;c.fillRect(vx-w,0,w*2,8);glow(c,vx,0.4,1.1,sc.glow,0.9*al);c.globalCompositeOperation="source-over";}
+    if(isWither()&&t>=S.release&&t<S.release+p.channel){const VJ=rig(victimState(t).pose,vx,-1);const ch=lerpV(VJ.hip,VJ.sh,0.6);const fade=Math.min(1,(S.release+p.channel-t)/0.15,(t-S.release)/0.06);
+      c.globalCompositeOperation="lighter";jag(c,ch,J.hR,Math.floor(t*12),0.08,14,`rgba(150,30,60,${0.7*fade})`,0.05);jag(c,ch,J.hR,Math.floor(t*12),0.08,14,`rgba(255,150,170,${0.6*fade})`,0.015);glow(c,J.hR.x,J.hR.y,0.35,"200,40,80",0.5*fade);c.globalCompositeOperation="source-over";}}
+  // lifesteal glow on the caster
+  if(a.bolt&&a.bolt.after==="drain"&&t>=S.impactEnd&&t<S.impactEnd+p.drain+0.3){const u=Math.min(1,(S.impactEnd+p.drain+0.3-t)/0.3);c.globalCompositeOperation="lighter";glow(c,J.hR.x,J.hR.y,0.4,sc.glow,0.4*u);glow(c,lerpV(J.hip,J.sh,0.5).x,lerpV(J.hip,J.sh,0.5).y,0.5,sc.glow,0.15*u);c.globalCompositeOperation="source-over";}
+  // launch flash
+  if(sim.launchAt!=null&&t-sim.launchAt<0.07&&!a.chain&&st.tab!=="smite"){c.globalCompositeOperation="lighter";glow(c,S.launch.x,S.launch.y,0.35,sc.glow,1-(t-sim.launchAt)/0.07);c.globalCompositeOperation="source-over";}
+}
+function schoolCard(c,J,i){
+  const a=A(),sc=SC();if(!sc)return;
+  if(i===0&&a.bolt&&a.bolt.shape!=="shard")drawSchoolOrb(c,J.hR,0.14,sc,a.bolt.shape,0,0);
+  if(i===0&&a.bolt&&a.bolt.shape==="shard")for(let k=0;k<3;k++)drawSchoolOrb(c,add(J.hR,v(0.06+k*0.02,(k-1)*0.09)),0.07,sc,"shard",0,(k-1)*0.25);
+  if(i===0&&(a.chain||st.tab==="smite")){c.globalCompositeOperation="lighter";glow(c,J.hR.x,J.hR.y,0.35,isWither()?"170,40,70":sc.glow,0.5);glow(c,J.hL.x,J.hL.y,0.3,isWither()?"170,40,70":sc.glow,0.4);c.globalCompositeOperation="source-over";}
+}
+
+// ---------- sound ----------
+let ac=null,sfxMute=false,noiseBuf=null;
+function audio(){if(!ac){try{ac=new (window.AudioContext||window.webkitAudioContext)();const n=ac.sampleRate;noiseBuf=ac.createBuffer(1,n*2,n);const d=noiseBuf.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=Math.random()*2-1;}catch(e){ac=null;}}return ac;}
+function noise(dur,type,f0,f1,gain){const a=ac,s=a.createBufferSource();s.buffer=noiseBuf;const fl=a.createBiquadFilter();fl.type=type;fl.frequency.setValueAtTime(f0,a.currentTime);fl.frequency.exponentialRampToValueAtTime(f1,a.currentTime+dur);const g=a.createGain();g.gain.setValueAtTime(gain,a.currentTime);g.gain.exponentialRampToValueAtTime(0.001,a.currentTime+dur);s.connect(fl);fl.connect(g);g.connect(a.destination);s.start();s.stop(a.currentTime+dur);}
+function tone(f0,f1,dur,gain,type="sine"){const a=ac,o=a.createOscillator();o.type=type;o.frequency.setValueAtTime(f0,a.currentTime);o.frequency.exponentialRampToValueAtTime(f1,a.currentTime+dur);const g=a.createGain();g.gain.setValueAtTime(gain,a.currentTime);g.gain.exponentialRampToValueAtTime(0.001,a.currentTime+dur);o.connect(g);g.connect(a.destination);o.start();o.stop(a.currentTime+dur);}
+function sfx(k){
+  if(!k||sfxMute||!st.sound||!ac||st.rate!==1)return;
+  try{
+    if(k==="whoosh")noise(0.22,"bandpass",500,2600,0.25);
+    if(k==="whoosh2")noise(0.14,"bandpass",700,2200,0.14);
+    if(k==="thump"){tone(110,38,0.32,0.7);noise(0.18,"lowpass",2200,300,0.45);}
+    if(k==="crack"){noise(0.09,"highpass",2500,6000,0.35);tone(180,60,0.12,0.4);}
+    if(k==="tick")tone(2400+Math.random()*900,1800,0.06,0.07,"triangle");
+    if(k==="ping"){noise(0.12,"highpass",3000,7000,0.3);tone(1600,1200,0.25,0.15,"triangle");}
+    if(k==="shatter"){noise(0.35,"highpass",4000,9000,0.4);for(let i=0;i<4;i++)tone(2000+Math.random()*2500,1500,0.12+Math.random()*0.15,0.06,"triangle");}
+    if(k==="clang"){tone(1180,1100,0.4,0.18,"triangle");tone(1730,1650,0.3,0.12,"triangle");noise(0.06,"highpass",2000,5000,0.4);tone(140,60,0.15,0.35);}
+    if(k==="thud"){tone(120,50,0.18,0.5);noise(0.1,"lowpass",1500,300,0.35);}
+    if(k==="wood"){tone(180,90,0.16,0.45,"triangle");noise(0.12,"bandpass",900,400,0.4);}
+    if(k==="twang"){tone(240,190,0.25,0.25,"triangle");noise(0.05,"bandpass",1800,900,0.2);}
+    if(k==="clack"){noise(0.05,"highpass",1500,4000,0.4);tone(320,200,0.12,0.25,"square");}
+    if(k==="thunk"){tone(150,70,0.12,0.45);noise(0.06,"bandpass",800,300,0.3);}
+    if(k==="fizz")noise(0.12,"highpass",3000,6000,0.25);
+    if(k==="slosh"){noise(0.2,"lowpass",900,300,0.35);tone(160,90,0.18,0.2);}
+    if(k==="splat"){noise(0.16,"lowpass",1800,250,0.5);tone(120,60,0.12,0.3);}
+    if(k==="rattle"){for(let i=0;i<4;i++)setTimeout(()=>{try{noise(0.03,"bandpass",2500,1800,0.25);}catch(e){}},i*45);}
+    if(k==="chime"){tone(1320,1250,0.35,0.12,"triangle");tone(1980,1900,0.25,0.07,"sine");}
+    if(k==="zap"){noise(0.14,"highpass",3000,8000,0.4);tone(90,60,0.14,0.25,"square");}
+    if(k==="pop"){tone(900,400,0.08,0.18,"triangle");}
+    if(k==="drain"){tone(200,90,0.8,0.2,"sawtooth");noise(0.8,"bandpass",600,250,0.12);}
+    if(k==="boom"){noise(0.6,"lowpass",3000,150,0.8);tone(90,35,0.5,0.7);}
+  }catch(e){}
+}
+
+// ---------- drawing ----------
+const cv=document.getElementById("stage"),ctx=cv.getContext("2d");
+let W=0,H=0,DPR=1;
+function resize(){const r=cv.getBoundingClientRect();DPR=Math.min(2,window.devicePixelRatio||1);W=Math.max(1,r.width);H=Math.max(1,r.height);cv.width=Math.round(W*DPR);cv.height=Math.round(H*DPR);}
+const PAL={
+  robe:{limb:"#6f6352",limbB:"#4c4438",body:"#b8ab8f",skirt:"#9d9077",hood:"#7d715d",trim:"#c9a45c",head:"#d6cfbc",face:"#14120e",leg:"#3e382f",hand:"#d9b48c"},
+  robe2:{limb:"#5c6b4f",limbB:"#3e4936",body:"#77875f",skirt:"#66744f",hood:"#55624a",trim:"#a8916a",head:"#d6cfbc",face:"#14120e",leg:"#3a3a30",hand:"#d9b48c"},
+  priest:{limb:"#c4b9a0",limbB:"#958a72",body:"#e3dccb",skirt:"#d2c9b3",hood:"#cfc5ad",trim:"#c9a45c",head:"#d6cfbc",face:"#14120e",leg:"#5a5346",hand:"#d9b48c"},
+  deadrobe:{limb:"#4a3f52",limbB:"#2e2735",body:"#3b3243",skirt:"#2f2836",hood:"#2a2330",trim:"#7a6a52",head:"#d6cfbc",face:"#0b0a0d",leg:"#26212b",hand:"#d8d0ba"},
+  footman:{limb:"#8a929a",limbB:"#5b6268",body:"#8e3a30",skirt:"#8e3a30",hood:"#9aa2a9",trim:"#b9bfc4",head:"#9aa2a9",face:"#141618",leg:"#4b5055",hand:"#5b6268"},
+  bone:{limb:"#d8d0ba",limbB:"#9c957f",body:"#2a2723",skirt:"#2a2723",hood:"#e2dbc6",trim:"#d8d0ba",head:"#e2dbc6",face:"#191712",leg:"#cbc3ac",hand:"#d8d0ba"}
+};
+function poly(c,pts,fill,stroke,lw){c.beginPath();c.moveTo(pts[0].x,pts[0].y);for(let i=1;i<pts.length;i++)c.lineTo(pts[i].x,pts[i].y);c.closePath();if(fill){c.fillStyle=fill;c.fill();}if(stroke){c.strokeStyle=stroke;c.lineWidth=lw;c.lineJoin="round";c.stroke();}}
+function seg(c,a,b,w,col){c.strokeStyle=col;c.lineWidth=w;c.lineCap="round";c.beginPath();c.moveTo(a.x,a.y);c.lineTo(b.x,b.y);c.stroke();}
+function mixHex(h,w,u){const p=s=>[1,3,5].map(i=>parseInt(s.slice(i,i+2),16));const a=p(h),b=p(w);return "rgb("+a.map((x,i)=>Math.round(lerp(x,b[i],u))).join(",")+")";}
+function glow(c,x,y,r,rgb,a){if(a<=0||r<=0)return;const g=c.createRadialGradient(x,y,0,x,y,r);g.addColorStop(0,`rgba(${rgb},${a})`);g.addColorStop(1,`rgba(${rgb},0)`);c.fillStyle=g;c.beginPath();c.arc(x,y,r,0,Math.PI*2);c.fill();}
+function drawWeapon(c,J,wp,sil,t,o){
+  if(!wp)return;
+  const w=weaponPts(J,wp);
+  if(wp.type==="sword"&&w){seg(c,w.a,w.guard,wp.big?0.05:0.045,sil||"#5a4630");seg(c,w.guard,w.b,wp.big?0.05:0.045,sil||(o.flash?"#fff":"#d9dde0"));
+    const gp=v(J.wd.y,-J.wd.x);seg(c,add(w.guard,mul(gp,wp.big?0.12:0.09)),add(w.guard,mul(gp,-(wp.big?0.12:0.09))),0.035,sil||"#8f7a4a");
+    c.beginPath();c.arc(w.a.x,w.a.y,0.035,0,Math.PI*2);c.fillStyle=sil||"#8f7a4a";c.fill();}
+  if(wp.type==="spear"&&w){seg(c,w.a,w.b,0.035,sil||"#7a5a36");const d=J.wd;poly(c,[add(w.b,mul(d,0.14)),add(w.b,v(-d.y*0.045,d.x*0.045)),add(w.b,v(d.y*0.045,-d.x*0.045))],sil||"#c9ccd0",null,0);}
+  if(wp.type==="crossbow"&&w){seg(c,w.a,w.b,0.07,sil||"#6b4c2e");const d=J.wd,pp=v(-d.y,d.x);const nose=add(w.b,mul(d,-0.04));
+    const ten=(t<S.release)||(S.reloadEnd!=null&&t>=S.reloadEnd-0.2);
+    const ta=add(nose,mul(pp,0.22)),tb=add(nose,mul(pp,-0.22));c.strokeStyle=sil||"#4a3a28";c.lineWidth=0.035;c.beginPath();c.moveTo(ta.x,ta.y);c.quadraticCurveTo(nose.x+d.x*0.08,nose.y+d.y*0.08,tb.x,tb.y);c.stroke();
+    const nk=add(nose,mul(d,-0.22*(ten?1:0)-0.03));c.strokeStyle=sil||"rgba(230,225,210,.8)";c.lineWidth=0.01;c.beginPath();c.moveTo(ta.x,ta.y);c.lineTo(nk.x,nk.y);c.lineTo(tb.x,tb.y);c.stroke();
+    if(ten&&!sil){seg(c,nk,add(nk,mul(d,0.32)),0.022,"#cfc4a8");}}
+  if(wp.type==="musket"&&w){seg(c,w.a,add(J.hR,mul(J.wd,0.35)),0.075,sil||"#6b4c2e");seg(c,J.hR,w.b,0.035,sil||"#5c6166");}
+}
+function drawBow(c,J,t,sil,live){
+  const d=J.wd||v(1,0),ax=v(-d.y,d.x),g=J.hL;
+  const tA=add(add(g,mul(d,-0.08)),mul(ax,0.44)),tB=add(add(g,mul(d,-0.08)),mul(ax,-0.44));
+  c.strokeStyle=sil||"#6b4c2e";c.lineWidth=0.04;c.lineCap="round";c.beginPath();c.moveTo(tA.x,tA.y);c.quadraticCurveTo(g.x+d.x*0.1,g.y+d.y*0.1,tB.x,tB.y);c.stroke();
+  const rest=lerpV(tA,tB,0.5);let nock=rest;
+  if(live&&t>S.windStart&&t<S.release){const u=clamp((t-S.windStart)/(S.coil-S.windStart),0,1);nock=lerpV(rest,J.hR,Math.min(1,u*1.4));}
+  if(!live)nock=rest;
+  if(live&&sim.stringAt!=null&&t>=sim.stringAt){const tau=t-sim.stringAt;nock=add(rest,mul(d,0.05*Math.exp(-14*tau)*Math.sin(tau*90)));}
+  c.strokeStyle=sil||"rgba(232,227,212,.75)";c.lineWidth=0.01;c.beginPath();c.moveTo(tA.x,tA.y);c.lineTo(nock.x,nock.y);c.lineTo(tB.x,tB.y);c.stroke();
+  const nocked=live?(t>S.windStart+0.1&&t<S.release):false;
+  if(nocked&&!sil){const ad=norm(sub(g,nock));drawArrow(c,add(nock,mul(ad,0.62)),ad,0.62);}
+}
+function drawArrow(c,tip,d,L,col){
+  const tail=add(tip,mul(d,-L));seg(c,tail,tip,0.016,col||"#cfc4a8");
+  const pp=v(-d.y,d.x);poly(c,[add(tip,mul(d,0.05)),add(tip,mul(pp,0.025)),add(tip,mul(pp,-0.025))],col||"#9aa0a6",null,0);
+  const f=add(tail,mul(d,0.08));poly(c,[tail,add(f,mul(pp,0.035)),add(tail,mul(d,0.1)),add(f,mul(pp,-0.035))],col||"#b8463a",null,0);
+}
+function drawActor(c,J,style,o={}){
+  const pal=PAL[style];const sil=o.sil;
+  const col=(k)=>sil?sil:(o.flash?mixHex(pal[k],"#ffffff",o.flash*0.85):(o.tint?mixHex(pal[k],o.tint,0.45):pal[k]));
+  const bone=style==="bone",robe=style==="robe"||style==="robe2"||style==="priest"||style==="deadrobe";
+  const lw=bone?0.065:0.115;
+  seg(c,J.sh,J.elL,lw,col("limbB"));seg(c,J.elL,J.hL,lw*0.95,col("limbB"));
+  seg(c,J.hip,J.kB,bone?0.06:0.12,col("leg"));seg(c,J.kB,J.aB,bone?0.055:0.11,col("leg"));seg(c,J.eB,J.tB,0.07,col("leg"));
+  const pr=v(J.up.y,-J.up.x);
+  if(bone){
+    seg(c,J.hip,J.sh,0.05,col("limb"));
+    const mid=lerpV(J.hip,J.sh,0.62);
+    c.save();c.beginPath();c.ellipse(mid.x,mid.y,0.17,0.24,Math.atan2(J.up.y,J.up.x)-Math.PI/2,0,Math.PI*2);c.fillStyle=col("body");c.fill();c.strokeStyle=col("limb");c.lineWidth=0.035;c.stroke();c.restore();
+    for(let i=0;i<3;i++){const p0=lerpV(J.hip,J.sh,0.45+i*0.12);seg(c,add(p0,mul(pr,-0.14)),add(p0,mul(pr,0.14)),0.022,col("limb"));}
+    c.beginPath();c.ellipse(J.hip.x,J.hip.y+0.02,0.13,0.07,0,0,Math.PI*2);c.fillStyle=col("limb");c.fill();
+  }else{
+    const pts=[add(J.hip,mul(pr,0.17)),add(J.sh,mul(pr,0.21)),add(J.sh,mul(pr,-0.21)),add(J.hip,mul(pr,-0.17))];
+    poly(c,pts,col("body"),col("body"),0.12);
+    if(robe){
+      seg(c,J.hip,J.kF,0.12,col("leg"));seg(c,J.kF,J.aF,0.11,col("leg"));seg(c,J.eF,J.tF,0.07,col("leg"));
+      const hem=[add(J.hip,mul(pr,0.2)),v(J.hip.x+0.32,0.1),v(J.hip.x-0.30,0.1),add(J.hip,mul(pr,-0.2))];
+      poly(c,hem,col("skirt"),col("skirt"),0.08);
+      seg(c,v(J.hip.x+0.30,0.12),v(J.hip.x-0.28,0.12),0.03,col("trim"));
+    }else seg(c,add(J.hip,mul(pr,0.18)),add(J.hip,mul(pr,-0.18)),0.06,col("trim"));
+  }
+  if(!robe){seg(c,J.hip,J.kF,bone?0.06:0.12,col("leg"));seg(c,J.kF,J.aF,bone?0.055:0.11,col("leg"));seg(c,J.eF,J.tF,0.07,col("leg"));}
+  const hu=J.hup,hf=v(hu.y,-hu.x);
+  const hw=bone?0.25:0.27,hh=0.26;
+  const corners=[add(add(J.head,mul(hu,hh)),mul(hf,hw)),add(add(J.head,mul(hu,hh)),mul(hf,-hw)),add(add(J.head,mul(hu,-hh)),mul(hf,-hw)),add(add(J.head,mul(hu,-hh)),mul(hf,hw))];
+  if(robe){
+    const hood=corners.map(p=>add(J.head,mul(sub(p,J.head),1.1)));
+    poly(c,hood,col("hood"),col("hood"),0.12);
+    if(!sil){const fc=add(J.head,mul(J.hfw,0.12));c.beginPath();c.ellipse(fc.x,fc.y-0.02,0.13,0.17,0,0,Math.PI*2);c.fillStyle=col("face");c.fill();
+      const eye=add(fc,mul(J.hfw,0.05));c.beginPath();c.arc(eye.x,eye.y+0.03,0.025,0,Math.PI*2);c.fillStyle=o.flash?"#fff":(o.eye||"#e9b75a");c.fill();}
+  }else{
+    poly(c,corners,col("head"),col("head"),0.1);
+    if(!sil){
+      if(bone){const e=add(add(J.head,mul(J.hfw,0.16)),mul(J.hup,0.03));c.beginPath();c.arc(e.x,e.y,0.06,0,Math.PI*2);c.fillStyle=col("face");c.fill();
+        const jaw=add(J.head,mul(J.hup,-0.2));seg(c,add(jaw,mul(J.hfw,0.25)),add(jaw,mul(J.hfw,-0.05)),0.02,col("face"));}
+      else{const vs=add(add(J.head,mul(J.hfw,0.22)),mul(J.hup,0.02));seg(c,vs,add(vs,mul(J.hfw,0.12)),0.05,col("face"));
+        seg(c,add(J.head,mul(J.hup,0.3)),add(J.head,mul(J.hup,0.36)),0.08,col("trim"));}
+    }
+  }
+  if(o.shield){const d=J.fw,g=J.hL;const u=v(-d.y,d.x);const ctr=add(g,mul(d,0.06));
+    const pts=[add(add(ctr,mul(u,0.38)),mul(d,-0.05)),add(add(ctr,mul(u,0.38)),mul(d,0.05)),add(add(ctr,mul(u,-0.34)),mul(d,0.05)),add(add(ctr,mul(u,-0.38)),mul(d,-0.05))];
+    poly(c,pts,sil||(o.flash?"#fff":"#6e4a2c"),sil||"#4a3220",0.05);if(!sil){seg(c,add(ctr,mul(u,0.32)),add(ctr,mul(u,-0.30)),0.025,"#b9bfc4");const boss=add(ctr,mul(d,0.06));c.beginPath();c.arc(boss.x,boss.y,0.045,0,Math.PI*2);c.fillStyle="#b9bfc4";c.fill();}}
+  if(o.bow)drawBow(c,J,o.t,sil,!o.static);
+  drawWeapon(c,J,o.weapon,sil,o.t,o);
+  seg(c,J.sh,J.elR,lw,col("limb"));seg(c,J.elR,J.hR,lw*0.95,col("limb"));
+  if(!sil){c.beginPath();c.arc(J.hR.x,J.hR.y,bone?0.045:0.07,0,Math.PI*2);c.fillStyle=col("hand");c.fill();
+    if(o.weapon&&o.weapon.lhand!=null){c.beginPath();c.arc(J.hL.x,J.hL.y,0.065,0,Math.PI*2);c.fillStyle=col("hand");c.fill();}}
+}
+function actorOpts(t,extra){const a=A();return Object.assign({eye:SC()?SC().eye:null,weapon:a.weapon&&a.weapon.type!=="bow"?a.weapon:null,bow:a.weapon&&a.weapon.type==="bow",shield:!!a.shield,t},extra||{});}
+function crystalPath(c,cr,s){
+  const h=cr.h*s,w=cr.w*Math.min(1,s*1.2);
+  c.save();c.translate(cr.x,0);c.rotate(-cr.lean*D2R);
+  poly(c,[v(-w/2,0),v(-w*0.32,h*0.72),v(0,h),v(0,0)],"#cfeeff",null,0);poly(c,[v(0,0),v(0,h),v(w*0.34,h*0.68),v(w/2,0)],"#6fa9cc",null,0);
+  c.strokeStyle="rgba(235,250,255,.9)";c.lineWidth=0.012;c.beginPath();c.moveTo(-w/2,0);c.lineTo(-w*0.32,h*0.72);c.lineTo(0,h);c.lineTo(w*0.34,h*0.68);c.lineTo(w/2,0);c.stroke();
+  c.restore();
+}
+function drawBall(c,pos,r,sx,sy,ang,wob=0){
+  c.save();c.translate(pos.x,pos.y);c.rotate(ang);
+  const w=1+0.06*Math.sin(wob*1.7);
+  const g=c.createRadialGradient(r*0.25*sx,0,0,0,0,r*Math.max(sx,sy));
+  g.addColorStop(0,"#fff6d6");g.addColorStop(0.35,"#ffc04a");g.addColorStop(0.7,"#f0601e");g.addColorStop(1,"rgba(160,30,10,0.0)");
+  c.fillStyle=g;c.beginPath();c.ellipse(0,0,r*sx*w,r*sy/w,0,0,Math.PI*2);c.fill();
+  c.restore();
+}
+let VIEW={s:1,cx:0,fy:.84};
+function toScreen(p){return v(W/2+(p.x-VIEW.cx)*VIEW.s,H*VIEW.fy-p.y*VIEW.s);}
+function drawScene(){
+  const c=ctx,t=st.t,a=A(),p=PP(),god=st.view==="god",vx=VX();
+  c.setTransform(DPR,0,0,DPR,0,0);
+  const bg=c.createLinearGradient(0,0,0,H);bg.addColorStop(0,"#0d1012");bg.addColorStop(0.78,"#151a1a");bg.addColorStop(1,"#0b0d0d");c.fillStyle=bg;c.fillRect(0,0,W,H);
+  const span=Math.max(vx-CASTER_X+2.6+(a.extra||0),4.6);
+  const fit=Math.min(W/(span+0.6),H/3.9);
+  const sc=(god?0.42*Math.min(1,span/7.4):1),cx=(CASTER_X+vx+(a.extra||0))/2,fy=god?0.62:0.84;
+  const s=fit*sc*(god?7.4/span:1);
+  VIEW={s,cx,fy};
+  c.setTransform(s*DPR,0,0,-s*DPR,(W/2-cx*s)*DPR,(H*fy)*DPR);
+  c.fillStyle="#1b1d18";c.fillRect(-6,-3,24,3);c.fillStyle="#2a2c24";c.fillRect(-6,-0.025,24,0.025);
+  const pr=mulberry(9);c.fillStyle="#24261f";for(let i=0;i<50;i++){c.beginPath();c.ellipse(-2+pr()*13,-0.08-pr()*0.6,0.02+pr()*0.05,0.01+pr()*0.02,0,0,Math.PI*2);c.fill();}
+  if(st.tab==="fireball"&&sim.impact!=null){const age=t-sim.impact;const al=clamp(0.75-age/(p.aftermath*2.5),0,0.75);c.fillStyle=`rgba(8,6,4,${al})`;c.beginPath();c.ellipse(vx,0.0,0.62,0.05,0,0,Math.PI*2);c.fill();}
+  if(st.tab==="ice"){
+    if(t>S.windStart){const u=clamp((t-S.windStart)/(S.release-S.windStart),0,1);const fade=t>S.release?clamp(1-(t-S.release)/1.5,0,1):1;
+      c.fillStyle=`rgba(180,225,245,${0.35*u*fade})`;c.beginPath();c.ellipse(CASTER_X,0.005,0.15+0.6*eOut(u),0.04,0,0,Math.PI*2);c.fill();}
+    if(t>=S.release){
+      const x0=CASTER_X+0.25,x1=vx;const pg=clamp((t-S.release)/Math.max(S.contact-S.release,1e-4),0,1);
+      const fade=sim.melt!=null?clamp(1-(t-sim.melt)/(p.aftermath),0,1):1;
+      const r=mulberry(4);c.strokeStyle=`rgba(200,236,255,${0.85*fade})`;c.lineWidth=0.018;c.beginPath();c.moveTo(x0,0.006);
+      for(let i=1;i<=24;i++){const u=i/24;if(u>pg)break;c.lineTo(lerp(x0,x1,u),0.006+(r()-.5)*0.012);}c.stroke();
+      c.fillStyle=`rgba(160,215,240,${0.18*fade})`;c.beginPath();c.ellipse(lerp(x0,x1,pg/2),0.003,(x1-x0)*pg/2+0.05,0.05,0,0,Math.PI*2);c.fill();
+    }
+    if(sim.melt!=null){const age=t-sim.melt;const al=clamp(0.5-age/(p.aftermath*1.6),0,0.5);c.fillStyle=`rgba(70,110,135,${al})`;for(const cr of sim.crystals){c.beginPath();c.ellipse(cr.x,0.004,cr.w*1.6,0.025,0,0,Math.PI*2);c.fill();}}
+  }
+  schoolDrawBack(c,t,null);
+  if(st.onion){const ps=poses(),I=ps.idle;
+    for(const [q,colr] of [[ps.coil,"rgba(217,154,58,.26)"],[ps.release,"rgba(239,220,160,.2)"],[ps.recoil,"rgba(138,149,143,.24)"]])
+      drawActor(c,rig(exag(q,I,p.exag),CASTER_X,1,a.weapon),styleOf(),actorOpts(t,{sil:colr,static:true}));}
+  const vs=schoolVictim(t,victimState(t));const VJ=rig(vs.pose,vx,-1);
+  drawActor(c,VJ,victimStyleOf(),{flash:vs.flash,tint:vs.frozen?"#9fd3ee":(vs.tint||null)});
+  drawChainVictims(c,t);
+  if(sim.stuck&&(st.tab==="bow"||st.tab==="crossbow")){const chest=lerpV(VJ.hip,VJ.sh,0.55);const tau=t-sim.impact;const wob=0.18*Math.exp(-4/Math.max(.3,p.aftermath??1)*tau)*Math.sin(tau*38);
+    const d0=sim.stuck.dir;const an=Math.atan2(d0.y,d0.x)+wob+vs.pose.lean*D2R*-1;const d=v(Math.cos(an),Math.sin(an));const L=st.tab==="bow"?0.62:0.36;
+    drawArrow(c,add(chest,mul(d,0.05)),d,L,st.tab==="crossbow"?null:null);}
+  const J=rig(casterPose(t),CASTER_X,1,a.weapon);
+  if(a.kind==="melee"&&sim.trail.length>1){for(let i=1;i<sim.trail.length;i++){const e0=sim.trail[i-1],e1=sim.trail[i];const u=i/sim.trail.length;poly(c,[e0.h,e0.t,e1.t,e1.h],`rgba(220,228,235,${0.3*u*u})`,null,0);}}
+  drawActor(c,J,styleOf(),actorOpts(t));
+  if(st.tab==="fireball"){
+    if(t>S.windStart&&t<S.release){const u=clamp((t-S.windStart)/(S.coil-S.windStart),0,1);const rr=(0.04+0.13*eIn(u))*(t>S.coil?1+0.06*Math.sin(t*40):1);
+      c.globalCompositeOperation="lighter";glow(c,J.hR.x,J.hR.y,rr*5,"255,150,50",0.35*u+0.05);c.globalCompositeOperation="source-over";drawBall(c,J.hR,rr,1,1,0);}
+    const ps=projState(t);
+    if(ps){const sp=S.dist/Math.max(S.contact-S.release,1e-3)*(st.mode==="five"?1:2*(1-ps.u));const sx=1+p.stretch*clamp(sp/6,0,2.2),sy=1/Math.sqrt(sx);
+      c.globalCompositeOperation="lighter";glow(c,ps.pos.x,ps.pos.y,0.7,"255,140,40",0.35);c.globalCompositeOperation="source-over";
+      drawBall(c,ps.pos,0.17,sx,sy,Math.atan2(ps.dir.y,ps.dir.x),(t-S.release)*30);}
+    if(st.mode==="five"&&t>=S.contact&&t<S.contact+0.034)drawBall(c,S.target,0.17,0.55,1.6,0);
+    if(sim.launchAt!=null){const age=t-sim.launchAt;
+      if(age<0.07){c.globalCompositeOperation="lighter";glow(c,S.launch.x,S.launch.y,0.45,"255,230,170",1-age/0.07);c.globalCompositeOperation="source-over";}
+      if(sim.ring&&age<0.6){const u=age/0.6;c.strokeStyle=`rgba(150,140,125,${0.3*(1-u)})`;c.lineWidth=0.04*(1-u)+0.01;c.beginPath();c.ellipse(sim.ring.x,sim.ring.y,0.1+0.35*eOut(u),0.12+0.4*eOut(u),0,0,Math.PI*2);c.stroke();}}
+    c.globalCompositeOperation="lighter";
+    for(const f of sim.fires){const age=t-f.born;if(age<0||age>f.life)continue;const k=age<0.1?age/0.1:1-Math.pow(age/f.life,2);
+      const fl=0.8+0.25*Math.sin(t*23+f.seed)+0.15*Math.sin(t*37+f.seed*2);const h=f.h*k*fl,w=0.06*k;
+      const g=c.createLinearGradient(f.x,0,f.x,Math.max(h,0.001));g.addColorStop(0,"rgba(255,220,120,.95)");g.addColorStop(0.5,"rgba(255,120,30,.75)");g.addColorStop(1,"rgba(200,40,10,0)");
+      c.fillStyle=g;c.beginPath();c.moveTo(f.x-w,0);c.quadraticCurveTo(f.x-w*1.1,h*0.5,f.x+Math.sin(t*9+f.seed)*0.02,h);c.quadraticCurveTo(f.x+w*1.1,h*0.5,f.x+w,0);c.closePath();c.fill();
+      glow(c,f.x,0.05,0.3,"255,120,40",0.18*k);}
+    c.globalCompositeOperation="source-over";
+  }
+  if(st.tab==="ice"){
+    if(t>S.windStart&&t<S.release+0.1){const u=clamp((t-S.windStart)/(S.release-S.windStart),0,1);c.globalCompositeOperation="lighter";glow(c,J.hR.x,J.hR.y,0.28,"170,225,255",0.45*u);glow(c,J.hL.x,J.hL.y,0.22,"170,225,255",0.35*u);c.globalCompositeOperation="source-over";}
+    const gF=p.grow/30,ov=p.overshoot/100;
+    for(const cr of sim.crystals){if(cr.dead!=null)continue;const u=clamp((t-cr.born)/gF,0,1);const s2=u<1?eBack(u,ov*9):1;crystalPath(c,cr,Math.max(0,s2));}
+    if(sim.impact!=null&&t-sim.impact<0.12){c.globalCompositeOperation="lighter";glow(c,vx,0.6,0.9,"200,240,255",0.7*(1-(t-sim.impact)/0.12));c.globalCompositeOperation="source-over";}
+  }
+  schoolDrawFront(c,t,J);
+  if(a.kind==="melee"&&sim.impact!=null&&t-sim.impact<0.08){const cp=contactPoint();c.globalCompositeOperation="lighter";glow(c,cp.x,cp.y,0.5,"255,240,200",0.9*(1-(t-sim.impact)/0.08));c.globalCompositeOperation="source-over";}
+  if(a.proj&&a.proj.type!=="ball"&&a.proj.type!=="orb"){const ps=projState(t);
+    if(ps){if(a.proj.type==="shot"){c.globalCompositeOperation="lighter";glow(c,ps.pos.x,ps.pos.y,0.12,"255,230,170",0.9);c.globalCompositeOperation="source-over";seg(c,ps.pos,add(ps.pos,mul(ps.dir,-0.5)),0.012,"rgba(230,225,210,.35)");}
+      else{seg(c,add(ps.pos,mul(ps.dir,-a.proj.len)),add(ps.pos,mul(ps.dir,-a.proj.len-0.35)),0.01,"rgba(232,227,212,.18)");drawArrow(c,ps.pos,ps.dir,a.proj.len);}}}
+  if(st.tab==="musket"){
+    if(sim.panAt!=null&&t-sim.panAt<0.06){c.globalCompositeOperation="lighter";glow(c,sim.panPt.x,sim.panPt.y+0.03,0.2,"255,220,140",1-(t-sim.panAt)/0.06);c.globalCompositeOperation="source-over";}
+    if(sim.launchAt!=null&&t-sim.launchAt<0.07){c.globalCompositeOperation="lighter";glow(c,S.launch.x+0.1,S.launch.y,0.55,"255,230,170",1-(t-sim.launchAt)/0.07);c.globalCompositeOperation="source-over";}
+  }
+  for(const q of sim.parts){
+    const al=clamp(q.life/q.max,0,1);
+    if(q.kind==="smoke"||q.kind==="mist"||q.kind==="dust"){const grow=1+(1-al)*(q.grow||1.8);const rgb=(q.rgb&&q.kind==="smoke")?q.rgb:q.kind==="mist"?"205,232,245":q.kind==="dust"?"205,198,178":"98,94,88";const aa=(q.kind==="mist"?0.16:q.kind==="dust"?0.35:(q.grow?0.42:0.3))*Math.min(1,al*1.5)*Math.min(1,(q.max-q.life)/0.08+0.2);glow(c,q.x,q.y,q.size*grow*1.4,rgb,aa);}
+  }
+  c.globalCompositeOperation="lighter";
+  for(const q of sim.parts){
+    const al=clamp(q.life/q.max,0,1);
+    if(q.kind==="ember"){c.fillStyle=q.rgb?`rgba(${q.rgb},${al})`:`rgba(255,${Math.round(120+100*al)},40,${al})`;c.beginPath();c.arc(q.x,q.y,q.size,0,Math.PI*2);c.fill();}
+    else if(q.kind==="spiral"){const h=J.hR;const x=h.x+Math.cos(q.ang)*q.r,y=h.y+Math.sin(q.ang)*q.r*0.8;const b=clamp(1-q.r/0.7,0.2,1);c.fillStyle=q.rgb?`rgba(${q.rgb},${b})`:`rgba(255,${Math.round(150+80*b)},70,${b})`;c.beginPath();c.arc(x,y,q.size,0,Math.PI*2);c.fill();}
+    else if(q.kind==="spark"){c.strokeStyle=q.rgb?`rgba(${q.rgb},${al})`:`rgba(255,235,170,${al})`;c.lineWidth=q.size;c.lineCap="round";c.beginPath();c.moveTo(q.x,q.y);c.lineTo(q.x-q.vx*0.035,q.y-q.vy*0.035);c.stroke();}
+  }
+  c.globalCompositeOperation="source-over";
+  for(const q of sim.parts){
+    const al=clamp(q.life/q.max,0,1);
+    if(q.kind==="shard"){c.save();c.translate(q.x,q.y);c.rotate(q.rot);poly(c,[v(-q.size*0.5,-q.size*0.3),v(q.size*0.6,0),v(-q.size*0.3,q.size*0.5)],`rgba(${q.col||"200,236,255"},${al})`,null,0);c.restore();}
+    else if(q.kind==="seek"){if(q.shard){c.save();c.translate(q.x,q.y);c.rotate(q.age*8);poly(c,[v(-q.size*0.5,-q.size*0.3),v(q.size*0.6,0),v(-q.size*0.3,q.size*0.5)],`rgba(${q.rgb},1)`,null,0);c.restore();}else{c.fillStyle=`rgba(${q.rgb},0.95)`;c.beginPath();c.arc(q.x,q.y,q.size,0,Math.PI*2);c.fill();}}
+    else if(q.kind==="drop"){c.fillStyle=`rgba(${q.rgb},0.95)`;c.beginPath();c.ellipse(q.x,q.y,q.size*0.8,q.size*1.2,0,0,Math.PI*2);c.fill();}
+    else if(q.kind==="snow"){c.fillStyle=`rgba(235,248,255,${al})`;c.beginPath();c.arc(q.x,q.y,q.size,0,Math.PI*2);c.fill();}
+  }
+  c.setTransform(DPR,0,0,DPR,0,0);
+  if(a.reload&&t>=S.release&&t<S.reloadEnd){
+    const hp=toScreen(add(J.head,v(0,0.62)));const u=clamp((t-S.release)/(S.reloadEnd-S.release),0,1);const rr=Math.max(9,VIEW.s*0.15);
+    c.lineWidth=3;c.strokeStyle="rgba(232,227,212,.18)";c.beginPath();c.arc(hp.x,hp.y,rr,0,Math.PI*2);c.stroke();
+    c.strokeStyle="#c9a45c";c.beginPath();c.arc(hp.x,hp.y,rr,-Math.PI/2,-Math.PI/2+u*Math.PI*2);c.stroke();
+    if(!god){c.font="500 11px 'IBM Plex Mono', ui-monospace, monospace";c.fillStyle="rgba(232,227,212,.8)";c.textAlign="center";c.textBaseline="middle";c.fillText((S.reloadEnd-t).toFixed(1),hp.x,hp.y);c.textAlign="left";}
+  }
+  const b=beatAt(t);
+  if(b>0){c.font="600 22px 'Barlow Condensed', 'Arial Narrow', sans-serif";c.fillStyle=getComputedStyle(document.documentElement).getPropertyValue(["","--b1","--b2","--b3","--b4","--b5"][b]).trim()||"#e8e3d4";c.textBaseline="top";c.fillText(BEATS[b][0].toUpperCase(),14,12);}
+  c.font="500 11px 'IBM Plex Mono', ui-monospace, monospace";c.fillStyle="rgba(232,227,212,.55)";c.textBaseline="bottom";
+  const vlabel=a.poses(p)&&p.variant?" · "+p.variant.toUpperCase():"";
+  c.fillText((god?"GOD HEIGHT · how it reads from above the table":(st.mode==="five"?"FIVE BEATS":"EVEN TIMING · effects on their own timers"))+vlabel,14,H-10);
+}
+
+// ---------- key pose cards ----------
+function drawPoseCard(i){
+  const el=document.getElementById("pose"+i),r=el.getBoundingClientRect();if(r.width<2)return;const dpr=Math.min(2,window.devicePixelRatio||1);
+  el.width=Math.round(r.width*dpr);el.height=Math.round(r.height*dpr);const c=el.getContext("2d");const cw=r.width,ch=r.height;
+  c.setTransform(dpr,0,0,dpr,0,0);c.fillStyle="#0d1012";c.fillRect(0,0,cw,ch);
+  const a=A(),p=PP(),ps=poses(),I=ps.idle;
+  const q=[ps.coil,ps.release,ps.recoil][i];const pose=exag(q,I,p.exag);
+  const wide=a.weapon&&(a.weapon.type==="spear"||a.weapon.big||a.weapon.type==="musket");
+  const s=ch/(wide?3.6:3.2);const off=wide?0.35:0.1;
+  c.setTransform(s*dpr,0,0,-s*dpr,(cw/2-(CASTER_X+off)*s)*dpr,ch*0.86*dpr);
+  c.fillStyle="#1b1d18";c.fillRect(-3,-1,10,1);c.fillStyle="#2a2c24";c.fillRect(-3,-0.02,10,0.02);
+  sim.stringAt=sim.stringAt;
+  drawActor(c,rig(I,CASTER_X,1,a.weapon),styleOf(),actorOpts(0,{sil:"rgba(232,227,212,.08)",static:true}));
+  const J=rig(pose,CASTER_X,1,a.weapon);
+  const save={stringAt:sim.stringAt};sim.stringAt=i===0?null:-1;
+  const tFake=i===0?(S.coil+S.holdEnd)/2:S.release+0.5;const keep=st.t;st.t=tFake;
+  drawActor(c,J,styleOf(),actorOpts(tFake,{static:i===0?false:true}));
+  st.t=keep;sim.stringAt=save.stringAt;
+  schoolCard(c,J,i);
+  if(st.tab==="fireball"&&i===0){c.globalCompositeOperation="lighter";glow(c,J.hR.x,J.hR.y,0.8,"255,150,50",0.4);c.globalCompositeOperation="source-over";drawBall(c,J.hR,0.17,1,1,0);}
+  if(st.tab==="ice"&&i<2){c.globalCompositeOperation="lighter";glow(c,J.hR.x,J.hR.y,0.3,"170,225,255",0.5);c.globalCompositeOperation="source-over";}
+}
+function drawPoses(){
+  for(let i=0;i<3;i++)drawPoseCard(i);
+  const a=A(),p=PP();
+  ["cap0t","cap1t","cap2t"].forEach((id,i)=>document.getElementById(id).textContent=a.cards[i]);
+  document.getElementById("cap0").textContent=`Held ${p.hold} frame${p.hold===1?"":"s"} after a ${p.windup.toFixed(2)} s wind-up`;
+  document.getElementById("cap1").textContent=a.kind==="melee"?`Reached in ${p.strike} frames, then frozen ${p.hitstop} ms`:(a.pan?`Fires ${p.hangfire} ms after the pan flash`:`Reached in ${p.strike} frame${p.strike===1?"":"s"}, the fastest move in the attack`);
+  document.getElementById("cap2").textContent=st.tab==="greatsword"?`Cut passes through in ${p.follow.toFixed(2)} s, held ${p.endHold} frames`:`Settles in ${p.recover.toFixed(2)} s`+(p.recoil!=null?` after a ${p.recoil}% push`:"");
+  const pn=document.getElementById("posenote");if(a.note){pn.hidden=false;pn.textContent=a.note;}else pn.hidden=true;
+}
+
+// ---------- UI ----------
+const fmt=(q,x)=>q.type==="choice"?x:q.unit==="frames"?`${x} f · ${Math.round(x/30*1000)} ms`:q.unit==="s"?`${(+x).toFixed(2)} s`:q.unit==="ms"?`${x} ms`:q.unit==="%"||q.unit==="% height"?`${x}%`:q.unit==="×"?`${(+x).toFixed(2)}×`:q.unit?`${x} ${q.unit}`:(+x).toFixed(2);
+function buildParams(){
+  const box=document.getElementById("params");box.innerHTML="";const a=A();
+  document.getElementById("sheettitle").textContent=a.name;
+  document.getElementById("sheetnote").textContent=(a.caster?"In the game: "+a.caster+". ":"")+"In the game, every number here is a field on the attack's feel data.";
+  const choice=a.params.filter(q=>q.type==="choice");if(choice.length)addGroup(box,-1,choice);
+  for(let b=1;b<=5;b++){const qs=a.params.filter(q=>q.beat===b);if(qs.length)addGroup(box,b,qs);}
+  addGroup(box,0,a.params.filter(q=>q.beat===0&&q.type!=="choice"));
+}
+function addGroup(box,b,qs){
+  if(!qs.length)return;
+  const g=document.createElement("div");g.className="pgroup";
+  const h=document.createElement("h3");
+  if(b>=0){h.innerHTML=`<span class="dot" style="background:${BEATS[b][1]}"></span>`;h.append(BEATS[b][0]);}else h.append("Variant");
+  g.append(h);
+  for(const q of qs){
+    const id="p-"+q.k;const w=document.createElement("div");w.className="prm";
+    if(q.type==="choice"){
+      const lab=document.createElement("label");lab.textContent=q.label;const sg=document.createElement("div");sg.className="seg choice";sg.setAttribute("role","group");sg.setAttribute("aria-label",q.label);
+      for(const opt of q.options){const bt=document.createElement("button");bt.type="button";bt.textContent=opt;bt.setAttribute("aria-pressed",String(PP()[q.k]===opt));
+        bt.addEventListener("click",()=>{PP()[q.k]=opt;sg.querySelectorAll("button").forEach(x=>x.setAttribute("aria-pressed",String(x===bt)));changed();});sg.append(bt);}
+      const sm=document.createElement("small");sm.textContent=q.help;w.append(lab,sg,sm);g.append(w);continue;
+    }
+    const lab=document.createElement("label");lab.htmlFor=id;const nm=document.createElement("span");nm.textContent=q.label;const out=document.createElement("output");out.id=id+"-o";out.textContent=fmt(q,PP()[q.k]);lab.append(nm,out);
+    const inp=document.createElement("input");inp.type="range";inp.id=id;inp.min=q.min;inp.max=q.max;inp.step=q.step;inp.value=PP()[q.k];
+    inp.addEventListener("input",()=>{PP()[q.k]=parseFloat(inp.value);out.textContent=fmt(q,PP()[q.k]);changed();});
+    const sm=document.createElement("small");sm.textContent=q.help;
+    w.append(lab,inp,sm);g.append(w);
+  }
+  box.append(g);
+}
+let changeTimer=null;
+function changed(){
+  const keep=st.t;buildSchedule();buildStrip();
+  simulateTo(Math.min(keep,S.end-0.01));drawPoses();
+  clearTimeout(changeTimer);changeTimer=setTimeout(persist,300);
+  if(!st.playing)drawScene();
+}
+function buildStrip(){
+  const segrow=document.getElementById("segrow"),axis=document.getElementById("axis");segrow.innerHTML="";axis.innerHTML="";
+  const pct=t=>(t/S.end*100)+"%";
+  for(const s of S.segs){const d=document.createElement("div");d.className="segb "+s.cls;d.style.left=pct(s.a);d.style.width=((s.b-s.a)/S.end*100)+"%";d.textContent=(s.b-s.a)/S.end>0.075?s.label:"";d.title=`${s.label||"Idle"} · ${Math.round((s.b-s.a)*1000)} ms`;segrow.append(d);}
+  const stepT=S.end>6?1:S.end>3?0.5:0.25;for(let x=0;x<=S.end+1e-6;x+=stepT){const sp=document.createElement("span");sp.style.left=pct(x);sp.textContent=x.toFixed(2);if(x/S.end>0.02&&x/S.end<0.98)axis.append(sp);}
+  document.querySelectorAll(".evrow").forEach(row=>{row.innerHTML="";const k=row.dataset.ev,tt=S.ev[k];
+    if(tt==null){const n=document.createElement("span");n.textContent="none";n.className="evnone";row.append(n);return;}
+    const off=Math.abs(tt-S.contact)>0.005&&k!=="recoil";
+    const tk=document.createElement("div");tk.className="evtick"+(off?" off":"");tk.style.left=pct(tt);row.append(tk);
+    if(off){const n=document.createElement("span");const ms=Math.round((tt-S.contact)*1000);n.textContent=(ms>0?"+":"")+ms+" ms";n.className="evoff";n.style.left=`calc(${pct(tt)} + 6px)`;row.append(n);}});
+  document.getElementById("contactline").style.left=pct(S.contact);
+  document.getElementById("stripnote").textContent=st.mode==="five"?`Everything fires from one contact event at ${S.contact.toFixed(3)} s, so damage, sound, effects and reaction land on the same frame.`
+    :`Even timing: no hold, no hitstop, no recoil. Sound fires 70 ms early, effects 100 ms late, the reaction 150 ms late and pops in. Red ticks are drift from contact.`;
+}
+function updatePlayhead(){document.getElementById("playhead").style.left=(st.t/S.end*100)+"%";document.getElementById("readout").textContent=`${st.t.toFixed(3)} s · f ${Math.floor(st.t*30)} @30`;}
+function selectTab(id){
+  st.tab=id;document.querySelectorAll(".tab").forEach(b=>b.setAttribute("aria-selected",String(b.dataset.tab===id)));
+  buildParams();buildSchedule();buildStrip();resetSim();st.t=0;drawPoses();buildRefs();renderApproved();persist();
+  if(!st.playing)simulateTo(S.contact+0.02);
+  drawScene();updatePlayhead();
+}
+function buildRefs(){
+  const tb=document.getElementById("refbody");tb.innerHTML="";
+  for(const [b,txt,url] of A().refs){const tr=document.createElement("tr");
+    const td1=document.createElement("td");const chip=document.createElement("span");chip.className="beatchip";chip.innerHTML=`<span class="dot" style="background:${BEATS[b][1]}"></span>`;chip.append(BEATS[b][0]);td1.append(chip);
+    const td2=document.createElement("td");td2.textContent=txt;
+    const td3=document.createElement("td");const an=document.createElement("a");an.href=url;an.target="_blank";an.rel="noopener";an.textContent="Watch";td3.append(an);
+    tr.append(td1,td2,td3);tb.append(tr);}
+}
+function segbind(id,fn){const el=document.getElementById(id);el.addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;
+  if(el.children.length===1){const on=b.getAttribute("aria-pressed")!=="true";b.setAttribute("aria-pressed",String(on));fn(on);}
+  else{el.querySelectorAll("button").forEach(x=>x.setAttribute("aria-pressed",String(x===b)));fn(b.dataset.v);}});}
+segbind("seg-rate",x=>{st.rate=parseFloat(x);});
+segbind("seg-mode",x=>{st.mode=x;changed();});
+segbind("seg-view",x=>{st.view=x;if(!st.playing)drawScene();});
+segbind("seg-onion",x=>{st.onion=x;if(!st.playing)drawScene();});
+segbind("seg-sound",x=>{st.sound=x;if(x)audio();if(ac&&ac.state==="suspended")ac.resume();});
+const playBtn=document.getElementById("play");
+playBtn.addEventListener("click",()=>{st.playing=!st.playing;playBtn.textContent=st.playing?"Pause":"Play";last=performance.now();});
+document.getElementById("stepb").addEventListener("click",()=>{st.playing=false;playBtn.textContent="Play";if(st.t+1/30>=S.end){resetSim();st.t=0;}stepSim(1/30,false);drawScene();updatePlayhead();});
+document.querySelectorAll(".tab").forEach(b=>b.addEventListener("click",()=>selectTab(b.dataset.tab)));
+const tracks=document.getElementById("tracks");
+function seekFromEvent(e){const r=tracks.getBoundingClientRect();const u=clamp((e.clientX-r.left)/r.width,0,1);simulateTo(u*S.end);drawScene();updatePlayhead();}
+let dragging=false;
+tracks.addEventListener("pointerdown",e=>{dragging=true;st.playing=false;playBtn.textContent="Play";tracks.setPointerCapture(e.pointerId);seekFromEvent(e);});
+tracks.addEventListener("pointermove",e=>{if(dragging)seekFromEvent(e);});
+tracks.addEventListener("pointerup",()=>{dragging=false;});
+
+function exportObj(){
+  const a=A(),p=PP();
+  const o={attack:a.name,kind:a.kind};
+  for(const q of a.params){const k=KEYMAP[q.k]||q.k;o[k]=p[q.k];}
+  o.hitstopAttackerMs=a.kind==="melee"?p.hitstop:0;
+  if(st.tab==="ice")o.crystalCount=ICE_N;
+  o.contactSeconds=+S.contact.toFixed(3);
+  return o;
+}
+const statusEl=document.getElementById("status"),jsonbox=document.getElementById("jsonbox");
+document.getElementById("copy").addEventListener("click",()=>{
+  const txt=JSON.stringify(exportObj(),null,2);jsonbox.value=txt;
+  const fallback=()=>{jsonbox.hidden=false;jsonbox.focus();jsonbox.select();statusEl.textContent="Copy is blocked here. The numbers are selected below; copy them by hand.";};
+  try{navigator.clipboard.writeText(txt).then(()=>{statusEl.textContent="Copied. Paste it into the chat if saving is unavailable.";},fallback);}catch(e){fallback();}
+});
+document.getElementById("reset").addEventListener("click",()=>{P[st.tab]=defaults(st.tab);buildParams();changed();statusEl.textContent="Back to the starting values.";});
+
+function renderApproved(){}
+
+let last=performance.now();
+function frame(now){
+  const dt=Math.min(0.05,(now-last)/1000);last=now;
+  if(st.playing){let left=dt*st.rate;while(left>0){const h=Math.min(left,1/120);if(st.t+h>=S.end){resetSim();st.t=0;}stepSim(h,false);left-=h;}drawScene();updatePlayhead();}
+  requestAnimationFrame(frame);
+}
+const ro=new ResizeObserver(()=>{resize();drawScene();drawPoses();});
+ro.observe(document.getElementById("stagebox"));
+resize();resetSim();
+document.querySelectorAll(".tab").forEach(b=>b.setAttribute("aria-selected",String(b.dataset.tab===st.tab)));
+buildParams();buildSchedule();buildStrip();buildRefs();
+if(!st.playing){playBtn.textContent="Play";simulateTo(S.contact+0.02);}
+drawScene();drawPoses();updatePlayhead();
+if(document.fonts&&document.fonts.ready)document.fonts.ready.then(()=>{drawScene();drawPoses();});
+requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>
